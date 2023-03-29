@@ -1,0 +1,19 @@
+{
+	"root": { "path": "/", "ssr": "root-ssr" },
+	"auth": [
+		{ "path": "/login", "page": "Login", "ssr": "login-ssr" },
+		{ "path": "/forgot", "page": "Forgot", "ssr": "forgot-ssr" },
+		{ "path": "/verify", "page": "EmailVerify", "ssr": "verify-ssr" },
+		{ "path": "/reset", "page": "Reset", "ssr": "reset-ssr" }
+	],
+	"main": [
+		{ "path": "/projects", "ssr": "projects-ssr", "page": "Projects", "text": "Projects", "secure": true, "key": "list-projects", "icon": "briefcase-3" },
+		{ "path": "/assets", "ssr": "assets-ssr", "page": "Assets", "text": "Assets", "secure": true, "key": "list-assets", "icon": "slideshow" },
+		{ "path": "/customers", "ssr": "customers-ssr", "page": "Customers", "text": "Customers", "secure": true, "key": "list-customers", "icon": "user-money" },
+		{ "path": "/certifiers", "ssr": "certifiers-ssr", "page": "Certifiers", "text": "Certifiers", "secure": true, "key": "list-certifiers", "icon": "graduate" },
+		{ "path": "/users", "ssr": "users-ssr", "page": "Users", "text": "Users", "secure": true, "key": "list-users", "icon": "user" },
+		{ "path": "/roles", "ssr": "roles-ssr", "page": "Roles", "text": "Roles", "secure": true, "key": "list-roles", "icon": "shield" },
+		{ "path": "/logout", "ssr": "logout-ssr", "secure": true },
+		{ "path": "/main", "ssr": "main-ssr", "secure": true }
+	]
+}

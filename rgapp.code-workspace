@@ -1,0 +1,13 @@
+{
+    "folders": [
+        {
+            "path": "../lts-server"
+        },
+        {
+            "path": "../rgapp-webapi"
+        },
+        {
+            "path": "."
+        }
+    ]
+}

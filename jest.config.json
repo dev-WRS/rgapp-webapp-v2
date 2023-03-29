@@ -1,0 +1,10 @@
+{
+	"roots": [
+		"<rootDir>", 
+		"<rootDir>/jest/"
+	],
+	"setupFiles": [
+		"<rootDir>/jest/setup-tests.js"
+	],
+	"testRegex": "(/__tests__/.*)(.test.js$)"
+}

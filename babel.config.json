@@ -1,0 +1,19 @@
+{
+	"presets":[
+        ["@babel/preset-env", { 
+			"targets": { "node": "current" }
+		}],
+        ["@babel/preset-react", {
+			"runtime": "automatic"
+		}]
+    ],
+	"plugins": [
+		["transform-assets", {
+			"extensions": ["svg", "jpg", "css"],
+			"name": "[name].[ext]?[sha512:hash:base64:7]"
+		}],
+		["module-resolver", {
+			"root": ["./src"]
+		}]
+	]
+}
