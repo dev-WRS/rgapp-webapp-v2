@@ -21,6 +21,7 @@
 		"express-session": "^1.17.3",
 		"icomoon-react": "^3.0.0",
 		"lodash": "^4.17.21",
+		"lts-server": "git+https://github.com/dev-WRS/lts-server-v2.git",
 		"moment": "^2.29.3",
 		"mongodb": "^4.6.0",
 		"nodemon": "^2.0.15",
