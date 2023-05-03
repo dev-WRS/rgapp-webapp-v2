@@ -16,7 +16,8 @@ const UserList = ({
 	users,
 	defaultAction,
 	onRefresh,
-	onActionClose
+	onActionClose,
+	isLoading
 }) => {
 	const theme = useTheme()
 	const columns = useMemo(() => [
@@ -58,6 +59,7 @@ const UserList = ({
 			defaultAction={defaultAction}
 			onRefresh={onRefresh}
 			onActionClose={onActionClose}
+			isLoading={isLoading}
 		/>
 	)
 }

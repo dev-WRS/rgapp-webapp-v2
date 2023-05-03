@@ -8,6 +8,7 @@ import IconButton from '@mui/material/IconButton'
 import Alert from '@mui/material/Alert'
 
 import DataTable from 'components/core/DataTable'
+import Spinner from 'components/core/Spinner'
 import DataFilters, { operators } from 'components/core/DataFilters'
 import Actions from 'components/core/Actions'
 import Action from 'components/core/Action'
@@ -258,17 +259,20 @@ const DataBrowser = ({
 				<Paper sx={{
 					flex: 1,
 					boxShadow: 'none',
-					overflowY: 'scroll',
+					overflowY: !isLoading ? 'scroll' : 'none',
 					...sx
-				}}>
-					<DataTable
-						multiSelect={multiSelect}
-						columns={columns}
-						rows={searching(filtering(rows, filtersState), searchState)}
-						filters={filtersState}
-						onSelectionChange={handleSelectionChange}
-						onRowDoubleClick={handleRowDoubleClick}
-					/>
+				}}> {
+					!isLoading
+						? <DataTable
+							multiSelect={multiSelect}
+							columns={columns}
+							rows={searching(filtering(rows, filtersState), searchState)}
+							filters={filtersState}
+							onSelectionChange={handleSelectionChange}
+							onRowDoubleClick={handleRowDoubleClick}
+							/>
+						: <Spinner></Spinner>
+				}
 				</Paper>
 			</Stack>
 			<Actions current={currentActionState}>

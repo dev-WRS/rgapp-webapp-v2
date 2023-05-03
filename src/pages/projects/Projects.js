@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import checkPermission from 'check-permission'
 
@@ -20,6 +20,7 @@ const Projects = () => {
 	const auth = useSelector(state => state.auth && state.auth.data)
 	const permissions = useSelector(state => state.permissions && state.permissions.data)
 	const projects = useSelector(state => state.projects && state.projects.data)
+	const [isLoading, setLoading] = useState(false)
 	const actions = useMemo(() => [
 		{ key: 'add-projects', label: 'Add', icon: 'plus', element: AddProject },
 		{ key: 'edit-projects', label: 'Edit', icon: 'pencil', element: EditProject, disabled: (selection) => (selection.length !== 1 || selection[0].status === 'approved' || selection[0].status === 'closed'), default: true },
@@ -32,13 +33,24 @@ const Projects = () => {
 	], [auth.role.name])
 
 	useEffect(() => {
-		dispatch(fetchProjects())
+		setLoading(true) 
+		dispatch(fetchProjects()).then(() => {
+			setTimeout(() => setLoading(false), 2000)
+		}).catch(() => setLoading(false))
 	}, [dispatch])
 
-	const handleRefresh = () => dispatch(fetchProjects())
+	const handleRefresh = () => {
+		setLoading(true) 
+		dispatch(fetchProjects()).then(() => {
+			setTimeout(() => setLoading(false), 2000)
+		}).catch(() => setLoading(false))
+	}
 	const handleActionClose = (action, result) => {
+		setLoading(true) 
 		if (result && result.type !== MSG_TYPE.error) {
-			dispatch(fetchProjects())
+			dispatch(fetchProjects()).then(() => {
+				setTimeout(() => setLoading(false), 2000)
+			}).catch(() => setLoading(false))
 		}
 	}
 
@@ -50,6 +62,7 @@ const Projects = () => {
 			defaultAction={actions.find(item => item.default)}
 			onRefresh={handleRefresh}
 			onActionClose={handleActionClose}
+			isLoading={isLoading}
 		/>
 	)
 }

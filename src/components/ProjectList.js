@@ -16,7 +16,8 @@ const ProjectList = ({
 	projects,
 	defaultAction,
 	onRefresh,
-	onActionClose
+	onActionClose,
+	isLoading
 }) => {
 	const theme = useTheme()
 
@@ -55,6 +56,7 @@ const ProjectList = ({
 			defaultAction={defaultAction}
 			onRefresh={onRefresh}
 			onActionClose={onActionClose}
+			isLoading={isLoading}
 		/>
 	)
 }

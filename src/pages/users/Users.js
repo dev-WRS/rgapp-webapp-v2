@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import checkPermission from 'check-permission'
 
@@ -18,6 +18,7 @@ const Users = () => {
 	const permissions = useSelector(state => state.permissions && state.permissions.data)
 	const roles = useSelector(state => state.roles && state.roles.data)
 	const users = useSelector(state => state.users && state.users.data)
+	const [isLoading, setLoading] = useState(false)
 	const actions = useMemo(() => [
 		{ key: 'add-users', label: 'Add', icon: 'plus', element: AddUser },
 		{ key: 'edit-users', label: 'Edit', icon: 'pencil', element: EditUser, disabled: (selection) => (selection.length !== 1), default: true },
@@ -31,27 +32,41 @@ const Users = () => {
 	], [])
 
 	useEffect(() => {
-		dispatch(fetchUsers())
+		setLoading(true) 
+		dispatch(fetchUsers()).then(() => {
+			setTimeout(() => setLoading(false), 2000)
+		}).catch(() => setLoading(false))
 	}, [dispatch])
 
-	const handleRefresh = () => dispatch(fetchUsers())
+	const handleRefresh = () => {
+		setLoading(true) 
+		dispatch(fetchUsers()).then(() => {
+			setTimeout(() => setLoading(false), 2000)
+		}).catch(() => setLoading(false))
+	}
+
 	const handleActionClose = (action, result) => {
+		setLoading(true) 
 		if (result && result.type !== MSG_TYPE.error) {
-			dispatch(fetchUsers())
+			dispatch(fetchUsers()).then(() => {
+				setTimeout(() => setLoading(false), 2000)
+			}).catch(() => setLoading(false))
 		}
 	}
 
-	return (
-		<UserList
-			actions={actions.filter(item => 
-				checkPermission(item, permissions))}
-			roles={roles}
-			users={users}
-			defaultAction={actions.find(item => item.default)}
-			onRefresh={handleRefresh}
-			onActionClose={handleActionClose}
-		/>
-	)
+		return (
+			<UserList
+				actions={actions.filter(item => 
+					checkPermission(item, permissions))}
+				roles={roles}
+				users={users}
+				defaultAction={actions.find(item => item.default)}
+				onRefresh={handleRefresh}
+				onActionClose={handleActionClose}
+				isLoading={isLoading}
+			/>
+		)
+
 }
 
 export default Users

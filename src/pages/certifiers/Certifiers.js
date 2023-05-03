@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import checkPermission from 'check-permission'
 
@@ -15,6 +15,7 @@ const Certifiers = () => {
 	const dispatch = useDispatch()
 	const permissions = useSelector(state => state.permissions && state.permissions.data)
 	const certifiers = useSelector(state => state.certifiers && state.certifiers.data)
+	const [isLoading, setLoading] = useState(false)
 	const actions = useMemo(() => [
 		{ key: 'add-certifiers', label: 'Add', icon: 'plus', element: AddCertifier },
 		{ key: 'edit-certifiers', label: 'Edit', icon: 'pencil', element: EditCertifier, disabled: (selection) => (selection.length !== 1), default: true },
@@ -22,13 +23,24 @@ const Certifiers = () => {
 	], [])
 
 	useEffect(() => {
-		dispatch(fetchCertifiers())
+		setLoading(true)
+		dispatch(fetchCertifiers()).then(() => {
+			setTimeout(() => setLoading(false), 2000)
+		}).catch(() => setLoading(false))
 	}, [dispatch])
 
-	const handleRefresh = () => dispatch(fetchCertifiers())
+	const handleRefresh = () => {
+		setLoading(true)
+		dispatch(fetchCertifiers()).then(() => {
+			setTimeout(() => setLoading(false), 2000)
+		}).catch(() => setLoading(false))
+	}
 	const handleActionClose = (action, result) => {
+		setLoading(true)
 		if (result && result.type !== MSG_TYPE.error) {
-			dispatch(fetchCertifiers())
+			dispatch(fetchCertifiers()).then(() => {
+				setTimeout(() => setLoading(false), 2000)
+			}).catch(() => setLoading(false))
 		}
 	}
 
@@ -40,6 +52,7 @@ const Certifiers = () => {
 			defaultAction={actions.find(item => item.default)}
 			onRefresh={handleRefresh}
 			onActionClose={handleActionClose}
+			isLoading={isLoading}
 		/>
 	)
 }

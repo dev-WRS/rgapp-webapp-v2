@@ -20,7 +20,7 @@ const assets = (state = {
 				didInvalidate: false
 			})
 		case Types.FETCH_ASSETS_SUCCESS:
-			return Object.assign({}, state, {
+		return Object.assign({}, state, {
 				inProgress: false,
 				isLoading: false,
 				didInvalidate: false,

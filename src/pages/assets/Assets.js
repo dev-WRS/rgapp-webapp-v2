@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import checkPermission from 'check-permission'
 
@@ -16,6 +16,7 @@ const Assets = () => {
 	const dispatch = useDispatch()
 	const permissions = useSelector(state => state.permissions && state.permissions.data)
 	const assets = useSelector(state => state.assets && state.assets.data)
+	const [isLoading, setLoading] = useState(false)
 	const actions = useMemo(() => [
 		{ key: 'upload-assets', label: 'Upload', icon: 'upload', element: AddAsset },
 		{ key: 'download-assets', label: 'Download', icon: 'download', element: DownloadAsset, disabled: (selection) => (selection.length !== 1) },
@@ -24,16 +25,26 @@ const Assets = () => {
 	], [])
 
 	useEffect(() => {
-		dispatch(fetchAssets())
+		setLoading(true) 
+		dispatch(fetchAssets()).then(() => {
+			setTimeout(() => setLoading(false), 2000)
+		}).catch(() => setLoading(false))
 	}, [dispatch])
 
-	const handleRefresh = () => dispatch(fetchAssets())
+	const handleRefresh = () => {
+		setLoading(true) 
+		dispatch(fetchAssets()).then(() => {
+			setTimeout(() => setLoading(false), 2000)
+		}).catch(() => setLoading(false))
+	}
 	const handleActionClose = (action, result) => {
+		setLoading(true) 
 		if (result && result.type !== MSG_TYPE.error) {
-			dispatch(fetchAssets())
+			dispatch(fetchAssets()).then(() => {
+				setTimeout(() => setLoading(false), 2000)
+			}).catch(() => setLoading(false))
 		}
 	}
-
 	return (
 		<AssetList
 			actions={actions.filter(item => 
@@ -42,6 +53,7 @@ const Assets = () => {
 			defaultAction={actions.find(item => item.default)}
 			onRefresh={handleRefresh}
 			onActionClose={handleActionClose}
+			isLoading={isLoading}
 		/>
 	)
 }
