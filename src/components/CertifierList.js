@@ -9,7 +9,8 @@ const CertifierList = ({
 	certifiers,
 	defaultAction,
 	onRefresh,
-	onActionClose
+	onActionClose,
+	isLoading
 }) => {
 	const theme = useTheme()
 
@@ -29,6 +30,7 @@ const CertifierList = ({
 			defaultAction={defaultAction}
 			onRefresh={onRefresh}
 			onActionClose={onActionClose}
+			isLoading={isLoading}
 		/>
 	)
 }

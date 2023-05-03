@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import checkPermission from 'check-permission'
 
@@ -15,6 +15,7 @@ const Customers = () => {
 	const dispatch = useDispatch()
 	const permissions = useSelector(state => state.permissions && state.permissions.data)
 	const customers = useSelector(state => state.customers && state.customers.data)
+	const [isLoading, setLoading] = useState(false)
 	const actions = useMemo(() => [
 		{ key: 'add-customers', label: 'Add', icon: 'plus', element: AddCustomer },
 		{ key: 'edit-customers', label: 'Edit', icon: 'pencil', element: EditCustomer, disabled: (selection) => (selection.length !== 1), default: true },
@@ -22,13 +23,24 @@ const Customers = () => {
 	], [])
 
 	useEffect(() => {
-		dispatch(fetchCustomers())
+		setLoading(true)
+		dispatch(fetchCustomers()).then(() => {
+			setTimeout(() => setLoading(false), 2000)
+		}).catch(() => setLoading(false))
 	}, [dispatch])
 
-	const handleRefresh = () => dispatch(fetchCustomers())
+	const handleRefresh = () => {
+		setLoading(true)
+		dispatch(fetchCustomers()).then(() => {
+			setTimeout(() => setLoading(false), 2000)
+		}).catch(() => setLoading(false))
+	}
 	const handleActionClose = (action, result) => {
+		setLoading(true)
 		if (result && result.type !== MSG_TYPE.error) {
-			dispatch(fetchCustomers())
+			dispatch(fetchCustomers()).then(() => {
+				setTimeout(() => setLoading(false), 2000)
+			}).catch(() => setLoading(false))
 		}
 	}
 
@@ -40,6 +52,7 @@ const Customers = () => {
 			defaultAction={actions.find(item => item.default)}
 			onRefresh={handleRefresh}
 			onActionClose={handleActionClose}
+			isLoading={isLoading}
 		/>
 	)
 }

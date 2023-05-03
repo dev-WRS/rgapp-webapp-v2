@@ -9,7 +9,8 @@ const CustomerList = ({
 	customers,
 	defaultAction,
 	onRefresh,
-	onActionClose
+	onActionClose,
+	isLoading
 }) => {
 	const theme = useTheme()
 
@@ -29,6 +30,7 @@ const CustomerList = ({
 			defaultAction={defaultAction}
 			onRefresh={onRefresh}
 			onActionClose={onActionClose}
+			isLoading={isLoading}
 		/>
 	)
 }

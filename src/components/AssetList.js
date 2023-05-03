@@ -17,7 +17,8 @@ const AssetList = ({
 	assets,
 	defaultAction,
 	onRefresh,
-	onActionClose
+	onActionClose,
+	isLoading
 }) => {
 	const theme = useTheme()
 	const columns = useMemo(() => [
@@ -56,6 +57,7 @@ const AssetList = ({
 			defaultAction={defaultAction}
 			onRefresh={onRefresh}
 			onActionClose={onActionClose}
+			isLoading={isLoading}
 		/>
 	)
 }
