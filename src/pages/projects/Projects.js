@@ -45,9 +45,9 @@ const Projects = () => {
 			setTimeout(() => setLoading(false), 2000)
 		}).catch(() => setLoading(false))
 	}
-	const handleActionClose = (action, result) => {
-		setLoading(true) 
+	const handleActionClose = (action, result) => {		
 		if (result && result.type !== MSG_TYPE.error) {
+			setLoading(true) 
 			dispatch(fetchProjects()).then(() => {
 				setTimeout(() => setLoading(false), 2000)
 			}).catch(() => setLoading(false))
