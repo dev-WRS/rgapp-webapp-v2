@@ -57,7 +57,15 @@ const BuildingForm = ({
 			const isNotJustLighting = !(qualifyingCategories.length === 1 && qualifyingCategories[0] === 'Lighting')
 
 			const newMethod = isNotJustLighting ? 'Permanent' : method
-			const newQualifyingCategory = qualifyingCategories.length === 3 ? ['Whole Building'] : qualifyingCategories
+			const newQualifyingCategory = qualifyingCategories.length === 3 
+											? ['Whole Building']
+											: qualifyingCategories.length === 1 && qualifyingCategories[0] === 'HVAC + L'
+											? ['HVAC', 'Lighting']
+											: qualifyingCategories.length === 1 && qualifyingCategories[0] === 'HVAC + ENV'
+											? ['HVAC', 'Envelope']
+											: qualifyingCategories.length === 1 && qualifyingCategories[0] === 'L + ENV'
+											? ['Lighting', 'Envelope']
+											: qualifyingCategories
 
 			let newSavingsRequirement = null 
 			let qualifiedDeduction = null
@@ -318,7 +326,15 @@ const BuildingForm = ({
 										size={'medium'}
 										valueProp="value"
 										textProp="value"
-										value={(state.qualifyingCategories && state.qualifyingCategories[0] === 'Whole Building') ? ['HVAC', 'Lighting', 'Envelope'] : state.qualifyingCategories}
+										value={(state.qualifyingCategories && state.qualifyingCategories[0] === 'Whole Building') 
+												? ['HVAC', 'Lighting', 'Envelope'] 
+												: (state.qualifyingCategories && state.qualifyingCategories[0] === 'HVAC + L')
+												? ['HVAC', 'Lighting'] 
+												: (state.qualifyingCategories && state.qualifyingCategories[0] === 'HVAC + ENV') 
+												? ['HVAC', 'Envelope']
+												: (state.qualifyingCategories && state.qualifyingCategories[0] === 'L + ENV') 
+												? ['Lighting', 'Envelope'] 
+												: state.qualifyingCategories}
 										options={[
 											{ 'value': 'HVAC' },
 											{ 'value': 'Lighting' },
