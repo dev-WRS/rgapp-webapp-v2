@@ -36,8 +36,8 @@ const Customers = () => {
 		}).catch(() => setLoading(false))
 	}
 	const handleActionClose = (action, result) => {
-		setLoading(true)
 		if (result && result.type !== MSG_TYPE.error) {
+			setLoading(true)
 			dispatch(fetchCustomers()).then(() => {
 				setTimeout(() => setLoading(false), 2000)
 			}).catch(() => setLoading(false))
