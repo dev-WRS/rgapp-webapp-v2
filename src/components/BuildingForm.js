@@ -201,7 +201,7 @@ const BuildingForm = ({
 		const { lpd } = lpds.find(item => item.taxYear <= parseInt(context.taxYear) && item.buildingType === value) || lpds.slice(-1)
 
 		onValueChange({ target: { id: 'ashraeLpd', value: lpd } })
-		onValueChange({ target: { id: 'ashraeRequiredLpd', value: value === 'Warehouse' ? (lpd * 0.5).toFixed(3) : (lpd * 0.4).toFixed(3) } })
+		onValueChange({ target: { id: 'ashraeRequiredLpd', value: value === 'Warehouse' ? (lpd * 0.5).toFixed(3) : (lpd * 0.6).toFixed(3) } })
 		onValueChange({ target: { id: 'type', value } })
 	}
 
