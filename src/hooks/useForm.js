@@ -124,7 +124,8 @@ const useForm = ({
 		})
 	}
 
-	const formValidate = () => {
+	const formValidate = (validationsPassed = undefined) => {
+		validations = validationsPassed || validations;
 		const validationErros = validate(validations)(state)
 		
 		setErrors(validationErros)

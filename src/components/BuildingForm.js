@@ -128,6 +128,7 @@ const BuildingForm = ({
 			state.method && state.method !== 'Permanent' ? newState['percentReduction'] = ['required', { type: 'rangeNumber', minValue: 25, maxValue: 100 }] : delete newState['percentReduction']
 
 			console.log('validate: ', newState)
+			formValidate(newState)
 			return newState
 		})
 		
@@ -174,7 +175,7 @@ const BuildingForm = ({
 		// 	console.log('validate: ', newState)
 		// 	return newState
 		// })
-
+		
 		let newSavingsRequirement = null
 		let qualifiedDeduction = null
 		let newRate = null
@@ -193,6 +194,9 @@ const BuildingForm = ({
 		onValueChange({ target: { id: 'percentReduction', value: newPercentReduction } })
 		onValueChange({ target: { id: 'savingsRequirement', value: newSavingsRequirement } })
 		onValueChange({ target: { id: 'method', value } })
+		if (value !== 'Permanent') {
+			onValueChange({ target: { id: 'type', value: ''} })
+		}
 	}
 
 	const handleTypeChange = (event) => {
