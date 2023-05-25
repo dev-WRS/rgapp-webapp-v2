@@ -42,6 +42,18 @@ export const createProject = (data) => async (...args) => {
 	return { payload, error, ...others }
 }
 
+export const copyProject = (id) => async (...args) => {
+	const { payload, error, ...others } = await actionRequest(...args)({
+		type: Types.COPY_PROJECT,
+		url: `/projects/${id}/copy`,
+		headers: { 'Content-Type': 'application/json' },
+		method: 'post',
+		data: { id }
+	})
+
+	return { payload, error, ...others }
+}
+
 export const updateProject = (id, data) => async (...args) => {
 	const { payload, error, ...others } = await actionRequest(...args)({
 		type: Types.UPDATE_PROJECT,

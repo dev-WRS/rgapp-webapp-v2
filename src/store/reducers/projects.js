@@ -15,6 +15,7 @@ const projects = (state = {
 				didInvalidate: false
 			})
 		case Types.CREATE_PROJECT:
+		case Types.COPY_PROJECT:
 		case Types.UPDATE_PROJECT:
 		case Types.CREATE_BUILDING:
 		case Types.UPDATE_BUILDING:
