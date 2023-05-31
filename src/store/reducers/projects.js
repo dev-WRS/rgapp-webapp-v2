@@ -18,6 +18,7 @@ const projects = (state = {
 		case Types.COPY_PROJECT:
 		case Types.UPDATE_PROJECT:
 		case Types.CREATE_BUILDING:
+		case Types.COPY_BUILDING:
 		case Types.UPDATE_BUILDING:
 		case Types.CREATE_DWELLING_UNIT:
 		case Types.UPDATE_DWELLING_UNIT:
@@ -44,6 +45,7 @@ const projects = (state = {
 				lastUpdated: action.receivedAt
 			})
 		case Types.CREATE_PROJECT_SUCCESS:
+		case Types.COPY_PROJECT_SUCCESS:
 			return Object.assign({}, state, {
 				inProgress: false,
 				isLoading: false,
@@ -59,6 +61,7 @@ const projects = (state = {
 		case Types.UPDATE_PROJECT_CERTIFIER_SUCCESS:
 		case Types.UPDATE_PROJECT_CUSTOMER_SUCCESS:
 		case Types.CREATE_BUILDING_SUCCESS:
+		case Types.COPY_BUILDING_SUCCESS:	
 		case Types.UPDATE_BUILDING_SUCCESS:
 		case Types.DELETE_BUILDING_SUCCESS:
 		case Types.CREATE_DWELLING_UNIT_SUCCESS:
@@ -82,12 +85,14 @@ const projects = (state = {
 		case Types.FETCH_PROJECT_FAILURE:
 		case Types.FETCH_PROJECT_INFO_FAILURE:
 		case Types.CREATE_PROJECT_FAILURE:
+		case Types.COPY_PROJECT_FAILURE:
 		case Types.UPDATE_PROJECT_FAILURE:
 		case Types.UPDATE_PROJECT_STATUS_FAILURE:
 		case Types.UPDATE_PROJECT_DWELLING_UNIT_FAILURE:
 		case Types.UPDATE_PROJECT_CERTIFIER_FAILURE:
 		case Types.UPDATE_PROJECT_CUSTOMER_FAILURE:
 		case Types.CREATE_BUILDING_FAILURE:
+		case Types.COPY_BUILDING_FAILURE:
 		case Types.UPDATE_BUILDING_FAILURE:
 		case Types.DELETE_BUILDING_FAILURE:
 		case Types.CREATE_DWELLING_UNIT_FAILURE:

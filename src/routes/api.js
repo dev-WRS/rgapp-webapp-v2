@@ -72,6 +72,7 @@ const apiRoutes = [
 
 	{ url: '/projects/:id/buildings', method: 'get' },
 	{ url: '/projects/:id/buildings', method: 'post' },
+	{ url: '/projects/:id/buildings/:buildingId/copy', method: 'post' },
 	{ url: '/projects/:id/buildings/:buildingId', method: 'get' },
 	{ url: '/projects/:id/buildings/:buildingId', method: 'put' },
 	{ url: '/projects/:id/buildings', method: 'delete' },

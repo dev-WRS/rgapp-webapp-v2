@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux'
 import BuildingList from 'components/BuildingList'
 
 import AddBuilding from './AddBuilding'
+import CopyBuilding from './CopyBuilding'
 import EditBuilding from './EditBuilding'
 import DeleteBuilding from './DeleteBuilding'
 
@@ -22,6 +23,7 @@ const Buildings = ({
 
 	const actions = useMemo(() => [
 		{ key: 'add-buildings', label: 'Add', icon: 'plus', element: AddBuilding },
+		{ key: 'copy-buildings', label: 'Copy', icon: 'copy', element: CopyBuilding, disabled: (selection) => (selection.length !== 1), default: true },
 		{ key: 'edit-buildings', label: 'Edit', icon: 'pencil', element: EditBuilding, disabled: (selection) => (selection.length !== 1), default: true },
 		{ key: 'delete-buildings', label: 'Delete', icon: 'trash-can', element: DeleteBuilding, disabled: (selection) => (selection.length === 0) }
 	], [])

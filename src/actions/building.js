@@ -32,6 +32,18 @@ export const createBuilding = (id, data) => async (...args) => {
 	return { payload, error, ...others }
 }
 
+export const copyBuilding = (id, buildingId) => async (...args) => {
+	const { payload, error, ...others } = await actionRequest(...args)({
+		type: Types.COPY_BUILDING,
+		url: `/projects/${id}/buildings/${buildingId}/copy`,
+		headers: { 'Content-Type': 'application/json' },
+		method: 'post',
+		data: {id, buildingId}
+	})
+
+	return { payload, error, ...others }
+}
+
 export const updateBuilding = (id, buildingId, data) => async (...args) => {
 	const { payload, error, ...others } = await actionRequest(...args)({
 		type: Types.UPDATE_BUILDING,
