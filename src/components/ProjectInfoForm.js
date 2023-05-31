@@ -144,7 +144,7 @@ const ProjectInfoForm = ({
 				<SearchFormField id="projectID" label="Search by Project ID" disabled={mode === 'edit' || inProgress}
 					fullWidth
 					size={'medium'}
-					value={state.projectID}
+					value={state.projectID.trim()}
 					autoFocus
 					onSearch={handleSearch}
 					onChange={onValueChange}
