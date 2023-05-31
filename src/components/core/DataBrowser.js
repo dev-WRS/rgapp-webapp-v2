@@ -6,6 +6,7 @@ import Divider from '@mui/material/Divider'
 import Tooltip from '@mui/material/Tooltip'
 import IconButton from '@mui/material/IconButton'
 import Alert from '@mui/material/Alert'
+import Typography from '@mui/material/Typography'
 
 import DataTable from 'components/core/DataTable'
 import Spinner from 'components/core/Spinner'
@@ -70,7 +71,8 @@ const DataBrowser = ({
 	onRefresh,
 	onSelectionChange,
 	onAction,
-	onActionClose
+	onActionClose,
+	showTotalType
 }) => {
 	const theme = useTheme()
 	const searchables = useMemo(() => columns
@@ -204,6 +206,9 @@ const DataBrowser = ({
 								onApplyFilter={handleApplyFilter}
 							/>
 						</Paper>
+					)}
+					{(showTotalType !== undefined && showTotalType.showTotal === true) && (
+						<Typography sx={{ marginTop: '10px' }}>Total {showTotalType.type}: {rows.length}</Typography>
 					)}
 					<Box sx={{ flexGrow: 1 }} />
 					<Box sx={{ alignSelf: "center", display: "flex" }} >

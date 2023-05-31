@@ -104,6 +104,7 @@ const DwellingUnitList = ({
 					context={context}
 					onRefresh={onRefresh}
 					onActionClose={onActionClose}
+					showTotalType={{showTotal: true, type: 'Units'}}
 				/>
 			) : (
 				<>
