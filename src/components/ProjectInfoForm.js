@@ -40,7 +40,7 @@ const fields = [
 ]
 const asField = (field) => (typeof field === 'object') ? field 
 													   : (field === 'draft') 
-													     ? { name: field, defaultValue: false } 
+													     ? { name: field, defaultValue: true } 
 														 : { name: field, defaultValue: '' }
 
 const ProjectInfoForm = ({
@@ -56,6 +56,7 @@ const ProjectInfoForm = ({
 	const fieldsInitial = useMemo(() => {
 		return fields.reduce((result, field) => {
 			field = asField(field)
+			field.defaultValue = field.name === 'draft' ? record[field.name] : field.defaultValue
 			result[field.name] = (mode === 'edit' && record[field.name]) ? record[field.name] : field.defaultValue
 			return result
 		}, {})
