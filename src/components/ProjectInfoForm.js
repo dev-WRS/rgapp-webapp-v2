@@ -3,6 +3,8 @@ import { useDispatch } from 'react-redux'
 import Grid from '@mui/material/Grid'
 import Stack from '@mui/material/Stack'
 import Alert from '@mui/material/Alert'
+import Switch from '@mui/material/Switch'
+import FormControlLabel from '@mui/material/FormControlLabel'
 
 import useForm from 'hooks/useForm'
 import TextField from 'components/core/TextField'
@@ -20,7 +22,7 @@ const validations = {
 	taxYear: ['required'],
 	legalEntity: ['required'],
 	state: ['required'],
-	reportType: ['required']
+	reportType: ['required'],
 }
 
 const fields = [
@@ -33,9 +35,13 @@ const fields = [
 		name: 'software',
 		defaultValue: null
 	}, 
-	'reportType'
+	'reportType',
+	'draft'
 ]
-const asField = (field) => (typeof field === 'object') ? field : { name: field, defaultValue: '' }
+const asField = (field) => (typeof field === 'object') ? field 
+													   : (field === 'draft') 
+													     ? { name: field, defaultValue: false } 
+														 : { name: field, defaultValue: '' }
 
 const ProjectInfoForm = ({
 	mode,
@@ -132,6 +138,11 @@ const ProjectInfoForm = ({
 		onValueChange({ target: { id: 'software', value: newSoftware } })
 		onValueChange({ target: { id: 'reportType', value } })
 	}
+
+	const handleDraftChange = (event) => {
+		const draft = event.target.checked
+		onValueChange({ target: { id: 'draft', value: draft } })
+	  };
 
 	const handleMsgClose = () => {
 		setMsgState(null)
@@ -232,6 +243,16 @@ const ProjectInfoForm = ({
 						onChange={handleReportTypeChange}
 						onBlur={onBlur}
 						{...getError('reportType')}
+					/>
+				</Stack>
+				<Stack direction="row" spacing={2}>
+				<FormControlLabel
+					control={
+						<Switch checked={state.draft} onChange={handleDraftChange} name="draft" 
+								color="secondary"
+								disabled={disabledFields || searchInProgress || inProgress}/>
+					}
+					label="Draft Page"
 					/>
 				</Stack>
 			</form>
