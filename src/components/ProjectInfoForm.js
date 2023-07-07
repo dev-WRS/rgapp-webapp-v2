@@ -56,8 +56,11 @@ const ProjectInfoForm = ({
 	const fieldsInitial = useMemo(() => {
 		return fields.reduce((result, field) => {
 			field = asField(field)
-			field.defaultValue = field.name === 'draft' ? record[field.name] : field.defaultValue
-			result[field.name] = (mode === 'edit' && record[field.name]) ? record[field.name] : field.defaultValue
+			if (mode === 'add') {
+				result[field.name] = field.defaultValue
+			} else {
+				result[field.name] = record[field.name] !== undefined ? record[field.name] : field.defaultValue
+			}
 			return result
 		}, {})
 	}, [mode, record])
