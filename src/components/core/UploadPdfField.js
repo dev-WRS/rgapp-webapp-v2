@@ -58,6 +58,12 @@ const UploadPdfField = ({
 			target: { id, name, files: [] }
 		})
 	}
+                                                                                                                                                                                                                                                                                 
+	const setPdfView = () => {
+		console.log('setPdfView')
+		const opened = window.open(`${value}`, '_blank')
+		if (opened) opened.focus()
+	}
 
 	return (
 		<FormControl fullWidth={fullWidth} error={error}>
@@ -86,7 +92,8 @@ const UploadPdfField = ({
 					}}
 				>
 					{src ? (
-						<object data={src} type="application/pdf" width="100%" height="100%">
+						<object data={src} type="application/pdf" width="100%" height="100%" 
+						sx={{cursor: 'wait'}}>
 							<p>Alternative text - include a link <a href={src}>to the PDF!</a></p>
 						</object>
 					) : (
@@ -95,7 +102,7 @@ const UploadPdfField = ({
 				</Box>
 				<Stack
 					direction={direction === 'row' ? 'column' : direction}
-					justifyContent={direction === 'row' ? 'center' : 'flex-end'}
+					justifyContent={direction === 'row' ? 'space-between' : 'space-between'}
 					alignItems="center"
 				>
 					{allowClear && (
@@ -103,6 +110,9 @@ const UploadPdfField = ({
 							onClick={handleClear}
 						/>
 					)}
+					<IconButton icon='top-right-arrow-box' size={22} color={'white'} sx={{ margin: theme.spacing(1) }} disabled={inProgress}
+						onClick={setPdfView}
+					/>
 					<IconButton icon='upload' size={22} color={'white'} sx={{ margin: theme.spacing(1) }} disabled={inProgress}
 						onClick={handleOpen}
 					/>
