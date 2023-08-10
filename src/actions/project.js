@@ -142,6 +142,18 @@ export const updateProjectPhoto = (id, { id: photoId, description }) => async (.
 	return { payload, error, ...others }
 }
 
+export const updateProjectPhotoChange = (projectId, photoId, data) => async (...args) => {
+	const { payload, error, ...others } = await actionRequest(...args)({
+		type: Types.UPDATE_PROJECT_PHOTO_CHANGE,
+		url: `/projects/${projectId}/photos/${photoId}/change`,
+		headers: { 'Content-Type': 'multipart/form-data' },
+		method: 'put',
+		data
+	})
+	
+	return { payload, error, ...others }
+}
+
 export const deleteProjectPhoto = (id, photoId) => async (...args) => {
 	const { payload, error, ...others } = await actionRequest(...args)({
 		type: Types.DELETE_PROJECT_PHOTO,

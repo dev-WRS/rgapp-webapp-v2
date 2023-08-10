@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 
 import PhotosList from 'components/PhotosList'
-import { createProjectPhoto, updateProjectPhoto, deleteProjectPhoto } from 'actions'
+import { createProjectPhoto, updateProjectPhoto, deleteProjectPhoto, updateProjectPhotoChange } from 'actions'
 
 const Photos = ({
 	mode,
@@ -38,6 +38,14 @@ const Photos = ({
 		if (error) setErrorState(error)
 	}
 
+	const handlePhotoChange = async ( {asset, photo}) => {
+		const data = new FormData()
+		data.append('asset', asset)
+
+		const { error } = await dispatch(updateProjectPhotoChange(projectId, photo.id, data))
+		if (error) setErrorState(error)
+	}
+
 	const handleDelete = async ({ id }) => {
 		const { error } = await dispatch(deleteProjectPhoto(projectId, id))
 		if (error) setErrorState(error)
@@ -51,6 +59,7 @@ const Photos = ({
 			onAdd={handleAdd}
 			onUpdate={handleUpdate}
 			onDelete={handleDelete}
+			onUpdatePhoto={handlePhotoChange}
 		/>
 	)
 }

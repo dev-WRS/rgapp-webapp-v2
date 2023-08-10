@@ -25,12 +25,15 @@ const PhotosList = ({
 	photos,
 	onAdd,
 	onUpdate,
-	onDelete
+	onDelete,
+	onUpdatePhoto
 }) => {
 	const theme = useTheme()
 	const [openErrorMsg, setOpenErrorMsg] = useState(false)
 	const [open, setOpen] = useState(0)
+	const [openForChange, setOpenForChange] = useState(false)
 	const [photo, setPhoto] = useState(null)
+	const [newPhoto, setNewPhoto] = useState(null)
 	const [selectionIndex, setSelectionIndex] = useState(-1)
 
 	useEffect(() => {
@@ -61,6 +64,17 @@ const PhotosList = ({
 		setOpen(open + 1)
 	}
 
+	const handleOpenForChange = () => {
+		setOpen(open + 1)
+		setOpenForChange(true)
+	}
+
+	const handlePhotoChange = () => {
+		onUpdatePhoto && onUpdatePhoto( newPhoto )
+		setNewPhoto(null)
+		setSelectionIndex(-1)
+	}
+
 	const handleSelect = (index) => (event) => {
 		if (index === selectionIndex) {
 			setPhoto(null)
@@ -76,13 +90,16 @@ const PhotosList = ({
 
 	const handleFileChange = (event) => {
 		const asset = event.target.files[0]
-
 		if (asset) {
 			const description = asset.name
-
 			setOpen(0)
-			setPhoto(photo ? { ...photo, description, asset } : { description, asset })
-		}
+			if (!openForChange) {
+					setPhoto(photo ? { ...photo, description, asset } : { description, asset })
+				} else {
+					setNewPhoto({ photo, asset })
+			}
+		} 
+
 	}
 
 	const handleDescriptionChange = (event) => {
@@ -107,6 +124,14 @@ const PhotosList = ({
 					justifyContent='center'
 					alignItems="flex-start"
 				>
+					<Tooltip title={'Replace'} arrow>
+						<span>
+							<IconButton icon={'swap'} size={22} color={'white'} sx={{ marginTop: theme.spacing(1.2), marginRight: '5px' }} 
+								disabled={(newPhoto && !!newPhoto.id) || inProgress} 
+								onClick={handlePhotoChange} 
+							/>
+						</span>
+					</Tooltip>
 					<Tooltip title={'Upload'} arrow>
 						<span>
 							<IconButton icon={'upload'} size={22} color={'white'} sx={{ marginTop: theme.spacing(1.2), marginRight: '5px' }} 
@@ -166,6 +191,19 @@ const PhotosList = ({
 									srcSet={`/api/assets/${item.asset}`}
 									alt={item.description}
 									loading="lazy"
+								/>
+								<ImageListItemBar
+									sx={{ backgroundColor: selectionIndex !== index ? '#4D4F5CCC' : '#88AC3ECC' }}
+									title={item.description}
+									position="top"
+									actionIcon={
+										<MuiIconButton sx={{ position: 'relative', top: 0 }}
+											disabled={inProgress}
+											onClick={handleOpenForChange}
+										>
+											<Icon icon={'swap'} size={22} color={'white'} />
+										</MuiIconButton>
+									}
 								/>
 								<ImageListItemBar
 									sx={{ backgroundColor: selectionIndex !== index ? '#4D4F5CCC' : '#88AC3ECC' }}
