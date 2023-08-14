@@ -64,9 +64,13 @@ const PhotosList = ({
 		setOpen(open + 1)
 	}
 
-	const handleOpenForChange = () => {
+	const handleOpenForChange = (index) => (event) => {
 		setOpen(open + 1)
 		setOpenForChange(true)
+		const newPhoto = photos[index]
+
+		setSelectionIndex(index)
+		setPhoto({ ...newPhoto })
 	}
 
 	const handlePhotoChange = () => {
@@ -80,12 +84,12 @@ const PhotosList = ({
 			setPhoto(null)
 			setSelectionIndex(-1)
 		}
-		else {
-			const newPhoto = photos[index]
+		// else {
+		// 	const newPhoto = photos[index]
 
-			setSelectionIndex(index)
-			setPhoto({ ...newPhoto })
-		}
+		// 	setSelectionIndex(index)
+		// 	setPhoto({ ...newPhoto })
+		// }
 	}
 
 	const handleFileChange = (event) => {
@@ -127,7 +131,7 @@ const PhotosList = ({
 					<Tooltip title={'Replace'} arrow>
 						<span>
 							<IconButton icon={'swap'} size={22} color={'white'} sx={{ marginTop: theme.spacing(1.2), marginRight: '5px' }} 
-								disabled={(newPhoto && !!newPhoto.id) || inProgress} 
+								disabled={newPhoto === null || (newPhoto && !!newPhoto.id)} 
 								onClick={handlePhotoChange} 
 							/>
 						</span>
@@ -151,7 +155,8 @@ const PhotosList = ({
 					</Tooltip>
 					<Tooltip title={'Update'} arrow>
 						<span>
-							<IconButton disabled={photo === null || (photo && !photo.id)} icon={'checkmark'} size={22} 
+							<IconButton disabled={(photo === null || (photo && !photo.id)) || (newPhoto !== null && newPhoto !== undefined && newPhoto.photo !== null 
+													&& newPhoto.photo !== undefined && newPhoto.photo.id)} icon={'checkmark'} size={22} 
 								color={'white'} 
 								sx={{ marginTop: theme.spacing(1.2) }} 
 								onClick={handleUpdate} 
@@ -194,12 +199,12 @@ const PhotosList = ({
 								/>
 								<ImageListItemBar
 									sx={{ backgroundColor: selectionIndex !== index ? '#4D4F5CCC' : '#88AC3ECC' }}
-									title={item.description}
+									// title={item.description}
 									position="top"
 									actionIcon={
 										<MuiIconButton sx={{ position: 'relative', top: 0 }}
 											disabled={inProgress}
-											onClick={handleOpenForChange}
+											onClick={handleOpenForChange(index)}
 										>
 											<Icon icon={'swap'} size={22} color={'white'} />
 										</MuiIconButton>

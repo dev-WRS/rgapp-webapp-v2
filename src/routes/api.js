@@ -85,6 +85,7 @@ const apiRoutes = [
 
 	{ url: '/projects/:id/photos', method: 'post' },
 	{ url: '/projects/:id/photos/:photoId', method: 'put' },
+	{ url: '/projects/:id/photos/:photoId/change', method: 'put' },
 	{ url: '/projects/:id/photos/:photoId', method: 'delete' },
 
 	{ url: '/projects/:id/certificate45L', method: 'put' },
