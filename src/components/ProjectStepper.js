@@ -47,6 +47,7 @@ const ProjectStepper = ({
 	const [activeStep, setActiveStep] = useState(0)
 	const [submit, setSubmit] = useState(false)
 	const [projectId, setProjectId] = useState()
+	const [originalProjectId, setOriginalProjectId] = useState()
 	const [steps, setSteps] = useState(initialSteps)
 	const StepPage = steps[activeStep].component
 
@@ -64,6 +65,7 @@ const ProjectStepper = ({
 
 			if (project) {
 				setProjectId(project.id)
+				setOriginalProjectId(project.originalProjectId)
 
 				newSteps = initialSteps.filter(step => (!step.types || (step.types && step.types.indexOf(project.reportType) !== -1 && (step.roles && step.roles.indexOf(auth.role.name) !== -1))))
 				setSteps(newSteps)
@@ -110,6 +112,7 @@ const ProjectStepper = ({
 									open={true}
 									inProgress={inProgress}
 									projectId={mode === 'edit' ? selectionId : projectId }
+									originalProjectId={originalProjectId}
 									onSubmit={handleSubmit}
 									submit={submit}
 									//onError={handleError}
