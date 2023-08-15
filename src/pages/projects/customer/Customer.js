@@ -13,6 +13,7 @@ const Customer = ({
 	mode,
 	submit,
 	projectId,
+	originalProjectId,
 	isLoading,
 	inProgress,
 	onSubmit,

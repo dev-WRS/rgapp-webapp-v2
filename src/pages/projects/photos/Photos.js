@@ -8,6 +8,7 @@ const Photos = ({
 	mode,
 	submit,
 	projectId,
+	originalProjectId,
 	inProgress,
 	onSubmit
 }) => {
@@ -42,7 +43,7 @@ const Photos = ({
 		const data = new FormData()
 		data.append('asset', asset)
 
-		const { error } = await dispatch(updateProjectPhotoChange(projectId, photo.asset, data))
+		const { error } = await dispatch(updateProjectPhotoChange(originalProjectId, photo.asset, data))
 		if (error) setErrorState(error)
 	}
 

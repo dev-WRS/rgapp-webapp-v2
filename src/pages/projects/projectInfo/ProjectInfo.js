@@ -6,6 +6,7 @@ const ProjectInfo = ({
 	mode,
 	submit,
 	projectId,
+	originalProjectId,
 	isLoading,
 	inProgress,
 	onSubmit,

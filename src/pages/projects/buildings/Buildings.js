@@ -12,6 +12,7 @@ const Buildings = ({
 	mode,
 	submit,
 	projectId,
+	originalProjectId,
 	isLoading,
 	inProgress,
 	onSubmit,

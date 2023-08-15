@@ -13,6 +13,7 @@ const DwellingInfo = ({
 	mode,
 	submit,
 	projectId,
+	originalProjectId,
 	isLoading,
 	inProgress,
 	onSubmit,
