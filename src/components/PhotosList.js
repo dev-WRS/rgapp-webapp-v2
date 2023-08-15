@@ -70,7 +70,8 @@ const PhotosList = ({
 		const newPhoto = photos[index]
 
 		setSelectionIndex(index)
-		setPhoto({ ...newPhoto })
+		setNewPhoto({ photo: newPhoto, asset: null })
+		setPhoto(null)
 	}
 
 	const handlePhotoChange = () => {
@@ -84,26 +85,31 @@ const PhotosList = ({
 			setPhoto(null)
 			setSelectionIndex(-1)
 		}
-		// else {
-		// 	const newPhoto = photos[index]
+		else {
+			const newPhoto = photos[index]
 
-		// 	setSelectionIndex(index)
-		// 	setPhoto({ ...newPhoto })
-		// }
+			setSelectionIndex(index)
+			setPhoto({ ...newPhoto })
+			setNewPhoto(null)
+		}
 	}
 
 	const handleFileChange = (event) => {
-		const asset = event.target.files[0]
-		if (asset) {
-			const description = asset.name
-			setOpen(0)
-			if (!openForChange) {
-					setPhoto(photo ? { ...photo, description, asset } : { description, asset })
-				} else {
-					setNewPhoto({ photo, asset })
-			}
-		} 
-
+		if (event.target.files.length === 0) {
+			setNewPhoto(null)
+			setPhoto(null)
+		} else {
+			const asset = event.target.files[0]
+			if (asset) {
+				const description = asset.name
+				setOpen(0)
+				if (!openForChange) {
+						setPhoto(photo ? { ...photo, description, asset } : { description, asset })
+					} else {
+						setNewPhoto({ photo, asset })
+				}
+			} 
+		}
 	}
 
 	const handleDescriptionChange = (event) => {
@@ -117,11 +123,12 @@ const PhotosList = ({
 	return (
 		<Stack direction="column">
 			<Stack direction="row" spacing={2}>
-				<TextField id="description" label="Photo Description" disabled={inProgress}
+				<TextField id="description" label="Photo Description"
 					fullWidth
 					size={'medium'}
 					value={(photo && photo.description) || ''}
 					onChange={handleDescriptionChange}
+					disabled={inProgress || (newPhoto !== null)}
 				/>
 				<Stack
 					direction='row'
@@ -131,7 +138,7 @@ const PhotosList = ({
 					<Tooltip title={'Replace'} arrow>
 						<span>
 							<IconButton icon={'swap'} size={22} color={'white'} sx={{ marginTop: theme.spacing(1.2), marginRight: '5px' }} 
-								disabled={newPhoto === null || (newPhoto && !!newPhoto.id)} 
+								disabled={newPhoto === null} 
 								onClick={handlePhotoChange} 
 							/>
 						</span>
@@ -155,8 +162,7 @@ const PhotosList = ({
 					</Tooltip>
 					<Tooltip title={'Update'} arrow>
 						<span>
-							<IconButton disabled={(photo === null || (photo && !photo.id)) || (newPhoto !== null && newPhoto !== undefined && newPhoto.photo !== null 
-													&& newPhoto.photo !== undefined && newPhoto.photo.id)} icon={'checkmark'} size={22} 
+							<IconButton disabled={(photo === null || (photo && !photo.id)) || (newPhoto !== null)} icon={'checkmark'} size={22} 
 								color={'white'} 
 								sx={{ marginTop: theme.spacing(1.2) }} 
 								onClick={handleUpdate} 
