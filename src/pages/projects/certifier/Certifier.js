@@ -13,7 +13,7 @@ const Certifier = ({
 	mode,
 	submit,
 	projectId,
-	originalProjectId,
+	originalProjectID,
 	isLoading,
 	inProgress,
 	onSubmit,
