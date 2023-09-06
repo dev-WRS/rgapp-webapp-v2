@@ -35,10 +35,27 @@ const PhotosList = ({
 	const [photo, setPhoto] = useState(null)
 	const [newPhoto, setNewPhoto] = useState(null)
 	const [selectionIndex, setSelectionIndex] = useState(-1)
+	const [photoData, setPhotoData] = useState([])
 
 	useEffect(() => {
 		setOpenErrorMsg(error ? true : false)	
 	}, [error])
+
+	useEffect(() => {
+		if (photos && photos.length > 0) {
+		  const fetchData = async () => {
+			const data = await Promise.all(
+			  photos.map(async (item) => {
+				const response = await fetch(`/api/assets/${item.asset}`)
+				const error400 = response.status === 400
+				return { ...item, error400 }
+			  })
+			)
+			setPhotoData(data)
+		  }
+		  fetchData()
+		}
+	  }, [photos])
 
 	const handleErrorMsgClose = () => setOpenErrorMsg(false)
 
@@ -56,7 +73,7 @@ const PhotosList = ({
 
 	const handleDelete = (index) => (event) => {
 		event.stopPropagation()
-		const selectedPhoto = photos[index]
+		const selectedPhoto = photoData[index]
 		onDelete && onDelete(selectedPhoto)
 	}
 
@@ -67,7 +84,7 @@ const PhotosList = ({
 	const handleOpenForChange = (index) => (event) => {
 		setOpen(open + 1)
 		setOpenForChange(true)
-		const newPhoto = photos[index]
+		const newPhoto = photoData[index]
 
 		setSelectionIndex(index)
 		setNewPhoto({ photo: newPhoto, asset: null })
@@ -86,7 +103,7 @@ const PhotosList = ({
 			setSelectionIndex(-1)
 		}
 		else {
-			const newPhoto = photos[index]
+			const newPhoto = photoData[index]
 
 			setSelectionIndex(index)
 			setPhoto({ ...newPhoto })
@@ -192,9 +209,10 @@ const PhotosList = ({
 					borderColor: 'rgba(0, 0, 0, 0.23)'
 				}}
 			>
-				{(photos && photos.length > 0) ? (
+				{(photoData && photoData.length > 0) ? (
 					<PhotoGallery sx={{ width: 552, height: 302, margin: 0 }} cols={2} rowHeight={182}>
-						{photos.map((item, index) => (
+						{photoData.map((item, index) => (
+							!item.error400 && (
 							<ImageListItem key={index} onClick={handleSelect(index)}>
 								<img
 									style={{ border: selectionIndex !== index ? 'none' : '2px solid #88AC3ECC' }}
@@ -228,7 +246,7 @@ const PhotosList = ({
 										</MuiIconButton>
 									}
 								/>
-							</ImageListItem>
+							</ImageListItem>)
 						))}
 					</PhotoGallery>
 				) : (
