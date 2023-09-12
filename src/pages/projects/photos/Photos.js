@@ -15,9 +15,9 @@ const Photos = ({
 	const dispatch = useDispatch()
 	const project = useSelector(state => state.projects && state.projects.data &&
 		projectId && state.projects.data.find(project => project.id === projectId))
-	// const photos = (mode === 'edit' && project['photos']) ? project['photos'] : []
 	const photos = (project && project['photos']) ? project['photos'] : []
 	const [errorState, setErrorState] = useState()
+	const [changeDone, setChangeDone] = useState(false)
 
 	useEffect(() => {
 		if (submit) {
@@ -39,12 +39,32 @@ const Photos = ({
 		if (error) setErrorState(error)
 	}
 
-	const handlePhotoChange = async ( {asset, photo}) => {
-		const data = new FormData()
-		data.append('asset', asset)
+	const handlePhotoChange = async ({asset, photo}) => {
+		try {
+			setTimeout(async () => {
+				if (changeDone) {
+					setChangeDone(false)
+					return
+				}
+				const data = new FormData()
+				data.append('asset', asset)
+				let error = '';
+				if (photo !== null) {
+					error = await dispatch(updateProjectPhotoChange(projectId, photo.asset, data)).error
+				} else {
+					error = 'Please start again. There is a trouble with the photo selected.'
+				}
+				if (error) setErrorState(error)
+	
+				setChangeDone(true);
+			}, 1000)
+		} catch (error) {
+			setErrorState(error)
+		}
+	}
 
-		const { error } = await dispatch(updateProjectPhotoChange(projectId, photo.asset, data))
-		if (error) setErrorState(error)
+	const handleUpdateChange = async () => {
+		setChangeDone(false)
 	}
 
 	const handleDelete = async ({ id }) => {
@@ -61,6 +81,7 @@ const Photos = ({
 			onUpdate={handleUpdate}
 			onDelete={handleDelete}
 			onUpdatePhoto={handlePhotoChange}
+			onUpdateChange={handleUpdateChange}
 		/>
 	)
 }

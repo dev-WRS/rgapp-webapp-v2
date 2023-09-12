@@ -26,7 +26,8 @@ const PhotosList = ({
 	onAdd,
 	onUpdate,
 	onDelete,
-	onUpdatePhoto
+	onUpdatePhoto,
+	onUpdateChange
 }) => {
 	const theme = useTheme()
 	const [openErrorMsg, setOpenErrorMsg] = useState(false)
@@ -37,6 +38,7 @@ const PhotosList = ({
 	const [selectionIndex, setSelectionIndex] = useState(-1)
 	const [photoData, setPhotoData] = useState([])
 
+
 	useEffect(() => {
 		setOpenErrorMsg(error ? true : false)	
 	}, [error])
@@ -44,18 +46,59 @@ const PhotosList = ({
 	useEffect(() => {
 		if (photos && photos.length > 0) {
 		  const fetchData = async () => {
-			const data = await Promise.all(
-			  photos.map(async (item) => {
-				const response = await fetch(`/api/assets/${item.asset}`)
-				const error400 = response.status === 400
-				return { ...item, error400 }
-			  })
-			)
-			setPhotoData(data)
+			try {
+			  const data = await Promise.all(
+				photos.map(async (item) => {
+				  item.error400 = true;
+	  
+				  const response = await fetch(`/api/assets/${item.asset}`)
+				  if (response.status === 400) {
+					return item;
+				  } else {
+					item.error400 = false;
+					return item;
+				  }
+				})
+			  );
+			  setPhotoData(data);
+			} catch (e) {
+			  console.error(e);
+			}
+		  };
+
+		  const arraysAreEqual = (array1, array2) => {
+			if (array1.length !== array2.length) {
+			  return false;
+			}
+			
+			for (let i = 0; i < array1.length; i++) {
+			  if (array1[i] !== array2[i]) {
+				return false;
+			  }
+			}
+			
+			return true;
+		  };
+		  
+		  if (!arraysAreEqual(photos, photoData)) {
+			fetchData();
 		  }
-		  fetchData()
 		}
-	  }, [photos])
+	  }, [newPhoto, onUpdateChange, photoData, photos])
+
+	 useEffect(() => {
+		setTimeout(() => {
+			console.log('newPhoto', newPhoto);
+			if (newPhoto && openForChange) {
+				onUpdatePhoto && onUpdatePhoto({...newPhoto})
+				setOpenForChange(false)
+				setNewPhoto(null)
+				setPhoto(null)
+				setSelectionIndex(-1)
+			}
+		}, 1000)
+
+	 },[newPhoto, onUpdatePhoto, openForChange]);
 
 	const handleErrorMsgClose = () => setOpenErrorMsg(false)
 
@@ -81,20 +124,9 @@ const PhotosList = ({
 		setOpen(open + 1)
 	}
 
-	const handleOpenForChange = (index) => (event) => {
-		setOpen(open + 1)
+	const handleOpenForChange = () => {
 		setOpenForChange(true)
-		const newPhoto = photoData[index]
-
-		setSelectionIndex(index)
-		setNewPhoto({ photo: newPhoto, asset: null })
-		setPhoto(null)
-	}
-
-	const handlePhotoChange = () => {
-		onUpdatePhoto && onUpdatePhoto( newPhoto )
-		setNewPhoto(null)
-		setSelectionIndex(-1)
+		setOpen(open + 1)
 	}
 
 	const handleSelect = (index) => (event) => {
@@ -107,7 +139,9 @@ const PhotosList = ({
 
 			setSelectionIndex(index)
 			setPhoto({ ...newPhoto })
+			setNewPhoto({ photo: newPhoto, asset: null })
 			setNewPhoto(null)
+			onUpdateChange && onUpdateChange()
 		}
 	}
 
@@ -122,8 +156,10 @@ const PhotosList = ({
 				setOpen(0)
 				if (!openForChange) {
 						setPhoto(photo ? { ...photo, description, asset } : { description, asset })
+						setNewPhoto(null);
 					} else {
 						setNewPhoto({ photo, asset })
+						setPhoto(null)				
 				}
 			} 
 		}
@@ -154,9 +190,10 @@ const PhotosList = ({
 				>
 					<Tooltip title={'Replace'} arrow>
 						<span>
-							<IconButton icon={'swap'} size={22} color={'white'} sx={{ marginTop: theme.spacing(1.2), marginRight: '5px' }} 
-								disabled={newPhoto === null} 
-								onClick={handlePhotoChange} 
+							<IconButton icon={'swap'} size={22} color={'white'} sx={{ marginTop: theme.spacing(1.2), marginRight: '5px' }}
+								disabled={(photo === null || (photo && !photo.id)) || (newPhoto !== null)}
+								// disabled={newPhoto === null} 
+								onClick={handleOpenForChange} 
 							/>
 						</span>
 					</Tooltip>
@@ -220,19 +257,6 @@ const PhotosList = ({
 									srcSet={`/api/assets/${item.asset}`}
 									alt={item.description}
 									loading="lazy"
-								/>
-								<ImageListItemBar
-									sx={{ backgroundColor: selectionIndex !== index ? '#4D4F5CCC' : '#88AC3ECC' }}
-									// title={item.description}
-									position="top"
-									actionIcon={
-										<MuiIconButton sx={{ position: 'relative', top: 0 }}
-											disabled={inProgress}
-											onClick={handleOpenForChange(index)}
-										>
-											<Icon icon={'swap'} size={22} color={'white'} />
-										</MuiIconButton>
-									}
 								/>
 								<ImageListItemBar
 									sx={{ backgroundColor: selectionIndex !== index ? '#4D4F5CCC' : '#88AC3ECC' }}
