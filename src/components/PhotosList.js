@@ -36,55 +36,10 @@ const PhotosList = ({
 	const [photo, setPhoto] = useState(null)
 	const [newPhoto, setNewPhoto] = useState(null)
 	const [selectionIndex, setSelectionIndex] = useState(-1)
-	const [photoData, setPhotoData] = useState([])
-
 
 	useEffect(() => {
 		setOpenErrorMsg(error ? true : false)	
 	}, [error])
-
-	useEffect(() => {
-		if (photos && photos.length > 0) {
-		  const fetchData = async () => {
-			try {
-			  const data = await Promise.all(
-				photos.map(async (item) => {
-				  item.error400 = true;
-	  
-				  const response = await fetch(`/api/assets/${item.asset}`)
-				  if (response.status === 400) {
-					return item;
-				  } else {
-					item.error400 = false;
-					return item;
-				  }
-				})
-			  );
-			  setPhotoData(data);
-			} catch (e) {
-			  console.error(e);
-			}
-		  };
-
-		  const arraysAreEqual = (array1, array2) => {
-			if (array1.length !== array2.length) {
-			  return false;
-			}
-			
-			for (let i = 0; i < array1.length; i++) {
-			  if (array1[i] !== array2[i]) {
-				return false;
-			  }
-			}
-			
-			return true;
-		  };
-		  
-		  if (!arraysAreEqual(photos, photoData)) {
-			fetchData();
-		  }
-		}
-	  }, [newPhoto, onUpdateChange, photoData, photos])
 
 	 useEffect(() => {
 		setTimeout(() => {
@@ -116,7 +71,7 @@ const PhotosList = ({
 
 	const handleDelete = (index) => (event) => {
 		event.stopPropagation()
-		const selectedPhoto = photoData[index]
+		const selectedPhoto = photos[index]
 		onDelete && onDelete(selectedPhoto)
 	}
 
@@ -135,7 +90,7 @@ const PhotosList = ({
 			setSelectionIndex(-1)
 		}
 		else {
-			const newPhoto = photoData[index]
+			const newPhoto = photos[index]
 
 			setSelectionIndex(index)
 			setPhoto({ ...newPhoto })
@@ -246,10 +201,9 @@ const PhotosList = ({
 					borderColor: 'rgba(0, 0, 0, 0.23)'
 				}}
 			>
-				{(photoData && photoData.length > 0) ? (
+				{(photos && photos.length > 0) ? (
 					<PhotoGallery sx={{ width: 552, height: 302, margin: 0 }} cols={2} rowHeight={182}>
-						{photoData.map((item, index) => (
-							!item.error400 && (
+						{photos.map((item, index) => (
 							<ImageListItem key={index} onClick={handleSelect(index)}>
 								<img
 									style={{ border: selectionIndex !== index ? 'none' : '2px solid #88AC3ECC' }}
@@ -270,7 +224,7 @@ const PhotosList = ({
 										</MuiIconButton>
 									}
 								/>
-							</ImageListItem>)
+							</ImageListItem>
 						))}
 					</PhotoGallery>
 				) : (
