@@ -5,6 +5,7 @@ const InputFile = ({
 	accept,
 	hidden, 
 	open,
+	multiple,
 	onChange
 }) => {
 	const element = useRef()
@@ -21,6 +22,7 @@ const InputFile = ({
 
 	return (
 		<input ref={element} type="file"
+			multiple={multiple}
 			name={name}
 			accept={accept}
 			hidden={hidden}

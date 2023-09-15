@@ -131,6 +131,18 @@ export const createProjectPhoto = (id, data) => async (...args) => {
 	return { payload, error, ...others }
 }
 
+export const createMultipleProjectPhoto = (id, data) => async (...args) => {
+	const { payload, error, ...others } = await actionRequest(...args)({
+		type: Types.CREATE_PROJECT_PHOTO,
+		url: `/projects/${id}/photosMultiple`,
+		headers: { 'Content-Type': 'multipart/form-data' },
+		method: 'post',
+		data
+	})
+
+	return { payload, error, ...others }
+}
+
 export const updateProjectPhoto = (id, { id: photoId, description }) => async (...args) => {
 	const { payload, error, ...others } = await actionRequest(...args)({
 		type: Types.UPDATE_PROJECT_PHOTO,

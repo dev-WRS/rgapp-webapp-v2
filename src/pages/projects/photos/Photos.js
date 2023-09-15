@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 
 import PhotosList from 'components/PhotosList'
-import { createProjectPhoto, updateProjectPhoto, deleteProjectPhoto, updateProjectPhotoChange } from 'actions'
+import { createProjectPhoto, updateProjectPhoto, deleteProjectPhoto, updateProjectPhotoChange, 
+		 createMultipleProjectPhoto } from 'actions'
 
 const Photos = ({
 	mode,
@@ -32,6 +33,19 @@ const Photos = ({
 
 		const { error } = await dispatch(createProjectPhoto(projectId, data))
 		if (error) setErrorState(error)
+	}
+
+	const handleAddMultiple = async( photosToUpload) => {
+		const data = new FormData()
+		photosToUpload.forEach(photo => {
+			Object.keys(photo).forEach(name => data.append(name, photo[name]))
+		})
+		try {
+			const { error } = await dispatch(createMultipleProjectPhoto(projectId, data))
+			if (error) setErrorState(error)
+		} catch (error) {
+			setErrorState(error)
+		}
 	}
 
 	const handleUpdate = async ({ id, description }) => {
@@ -78,6 +92,7 @@ const Photos = ({
 			photos={photos}
 			inProgress={inProgress}
 			onAdd={handleAdd}
+			onAddMultiple={handleAddMultiple}
 			onUpdate={handleUpdate}
 			onDelete={handleDelete}
 			onUpdatePhoto={handlePhotoChange}

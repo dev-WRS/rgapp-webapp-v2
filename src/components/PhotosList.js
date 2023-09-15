@@ -17,6 +17,7 @@ import PhotoGallery from 'components/core/PhotoGallery'
 import InputFile from 'components/core/InputFile'
 import { useTheme } from '@emotion/react'
 import { Icon } from 'styles'
+import { forEach } from 'lodash'
 
 const PhotosList = ({
 	error,
@@ -24,6 +25,7 @@ const PhotosList = ({
 	emptyText = 'Photo Gallery',
 	photos,
 	onAdd,
+	onAddMultiple,
 	onUpdate,
 	onDelete,
 	onUpdatePhoto,
@@ -53,7 +55,7 @@ const PhotosList = ({
 			}
 		}, 1000)
 
-	 },[newPhoto, onUpdatePhoto, openForChange]);
+	},[newPhoto, onUpdatePhoto, openForChange]);
 
 	const handleErrorMsgClose = () => setOpenErrorMsg(false)
 
@@ -104,7 +106,7 @@ const PhotosList = ({
 		if (event.target.files.length === 0) {
 			setNewPhoto(null)
 			setPhoto(null)
-		} else {
+		} else if (event.target.files.length === 1) {
 			const asset = event.target.files[0]
 			if (asset) {
 				const description = asset.name
@@ -117,6 +119,16 @@ const PhotosList = ({
 						setPhoto(null)				
 				}
 			} 
+		} else if (event.target.files.length > 1) {
+			setOpen(0)
+			const photosToUpload = []
+			forEach(event.target.files, (asset) => {
+				const description = ''
+				photosToUpload.push({ description, asset })
+			})
+			onAddMultiple && onAddMultiple(photosToUpload)
+			setNewPhoto(null)
+			setPhoto(null)
 		}
 	}
 
@@ -185,6 +197,7 @@ const PhotosList = ({
 				open={open}
 				accept="image/png, image/jpeg"
 				hidden
+				multiple={selectionIndex === -1}
 				onChange={handleFileChange}
 			/>
 			<Box
