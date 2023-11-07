@@ -49,6 +49,7 @@ const ProjectStepper = ({
 	const [projectId, setProjectId] = useState()
 	const [originalProjectID, setOriginalProjectID] = useState()
 	const [steps, setSteps] = useState(initialSteps)
+	const [taxYear, setTaxYear] = useState(0)
 	const StepPage = steps[activeStep].component
 
 	const handleNext = () => {
@@ -69,6 +70,7 @@ const ProjectStepper = ({
 
 				newSteps = initialSteps.filter(step => (!step.types || (step.types && step.types.indexOf(project.reportType) !== -1 && (step.roles && step.roles.indexOf(auth.role.name) !== -1))))
 				setSteps(newSteps)
+				setTaxYear(project.taxYear)
 			}
 							
 			if (activeStep < newSteps.length - 1) {
@@ -85,7 +87,7 @@ const ProjectStepper = ({
 				disableEscapeKeyDown
 				PaperProps={{
 					sx: {
-						maxWidth: '600px',
+						maxWidth: taxYear && parseInt(taxYear) < 2023 && activeStep !== 1 ? '600px' : '800px',
 						minWidth: '600px',
 						minHeight: '300px'
 					}

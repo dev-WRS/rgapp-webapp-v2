@@ -59,9 +59,11 @@ const generateBuildings = () => {
 			qualifyingCategories: qualifyingCategories.slice(generateNumber(0, qualifyingCategories.length - 1)),
 			area: generateNumber(1000, 3000),
 			rate: generateNumber(100, 500),
+			pwRate: generateNumber(100, 500),
 			method: methods[generateNumber(0, methods.length - 1)],
 			totalWatts: generateNumber(1000, 5000),
-			percentReduction: generateNumber(20, 90)
+			percentReduction: generateNumber(20, 90),
+			percentSavings: generateNumber(20, 90)
 		})
 	}
 

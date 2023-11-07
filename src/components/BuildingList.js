@@ -40,12 +40,23 @@ const BuildingList = ({
 				return `${row[column.dataKey].toLocaleString('en-US', {maximumFractionDigits:2})} sqft`
 			}
 		},
-		{ label: 'Rate', dataKey: 'rate', dataType: 'string', disablePadding: false, 
+		...(parseInt(context.taxYear) >= 2023 ?
+        [
+            { label: '% Saving', dataKey: 'percentSaving', dataType: 'string', disablePadding: false,
+                render: (row, column) => {
+					return `${row[column.dataKey].toFixed(2)}%` 
+                }
+            }
+        ] : []
+    	),
+		{ label: parseInt(context.taxYear) < 2023 ? 'Rate' : 'Rate / PW Rate', dataKey: 'rate', dataType: 'string', disablePadding: false, 
 			render: (row, column) => {
-				return `$${row[column.dataKey].toFixed(2)}`
+				return parseInt(context.taxYear) < 2023 
+					? `$${row[column.dataKey].toFixed(2)}` 
+					: `$${row['rate'].toFixed(2)}% - $${row['pwRate'].toFixed(2)}`;
 			}
 		}
-	], [])
+	], [context])
 	const [openState, setOpenState] = useState(false)
 	const [openMsgState, setOpenMsgState] = useState(false)
 	const [msgState, setMsgState] = useState()
@@ -110,7 +121,7 @@ const BuildingList = ({
 					sx={{
 						minHeight: '302px',
 						maxHeight: '302px',
-						overflow: 'scroll'
+						overflow: 'scroll',
 					}}
 					actions={actions}
 					columns={columns}
