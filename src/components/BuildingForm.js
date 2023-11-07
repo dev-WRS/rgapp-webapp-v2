@@ -371,7 +371,7 @@ const BuildingForm = ({
 							/>
 							<Grid container spacing={2}>
 								<Grid item xs={6}>
-									<MultipleSelectField id="qualifyingCategories" label="Qualifying Categories" disabled={inProgress || context.taxYear === '2023'}
+									<MultipleSelectField id="qualifyingCategories" label="Qualifying Categories" disabled={inProgress || parseInt(context.taxYear) >= 2023}
 										fullWidth
 										size={'medium'}
 										valueProp="value"
@@ -435,7 +435,7 @@ const BuildingForm = ({
 										/>
 									</Grid>
 									<Grid item xs={3}>
-										<CurrencyField id="rate" label="Rate" disabled={inProgress}
+										<CurrencyField id="rate" label="Rate" disabled={inProgress || parseInt(context.taxYear) >= 2023}
 											fullWidth
 											size={'medium'}
 											value={state.rate}
@@ -445,7 +445,7 @@ const BuildingForm = ({
 										/>
 									</Grid>
 									<Grid item xs={3}>
-										<CurrencyField id="pwRate" label="PW Rate" disabled={inProgress}
+										<CurrencyField id="pwRate" label="PW Rate" disabled={inProgress || parseInt(context.taxYear) >= 2023}
 											fullWidth
 											size={'medium'}
 											value={state.pwRate}
