@@ -54,7 +54,7 @@ const BuildingForm = ({
 		validations = { name: ['required'],	address: ['required'], type: ['required'], qualifyingCategories: ['required'], area: ['required'],
 						rate: ['required'],
 						pwRate: ['required'],
-						percentSaving: ['required', { type: 'rangeNumber', minValue: 25, maxValue: 50 }] }
+						percentSaving: ['required', { type: 'rangeNumber', minValue: 25, maxValue: 100 }] }
 	} else {
 		validations = {	name: ['required'],	address: ['required'],	type: ['required'],	qualifyingCategories: ['required'],	area: ['required'], rate: ['required'],	method: ['required'] }		
 		fields = ['name', 'type', 'address', 'qualifyingCategories', 'area', 'rate', 'method', 'totalWatts', 'percentReduction', 'savingsRequirement']

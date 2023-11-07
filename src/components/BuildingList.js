@@ -49,13 +49,20 @@ const BuildingList = ({
             }
         ] : []
     	),
-		{ label: parseInt(context.taxYear) < 2023 ? 'Rate' : 'Rate / PW Rate', dataKey: 'rate', dataType: 'string', disablePadding: false, 
+		{ label: 'Rate', dataKey: 'rate', dataType: 'string', disablePadding: false, 
 			render: (row, column) => {
-				return parseInt(context.taxYear) < 2023 
-					? `$${row[column.dataKey].toFixed(2)}` 
-					: `$${row['rate'].toFixed(2)}% - $${row['pwRate'].toFixed(2)}`;
+				return `$${row[column.dataKey].toFixed(2)}`
 			}
-		}
+		},
+		...(parseInt(context.taxYear) >= 2023 ?
+        [
+            { label: 'PW Rate', dataKey: 'percentSaving', dataType: 'string', disablePadding: false,
+                render: (row, column) => {
+					return `$${row['pwRate'].toFixed(2)}`;
+                }
+            }
+        ] : []
+		)
 	], [context])
 	const [openState, setOpenState] = useState(false)
 	const [openMsgState, setOpenMsgState] = useState(false)
