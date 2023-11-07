@@ -44,7 +44,7 @@ const BuildingList = ({
         [
             { label: '% Saving', dataKey: 'percentSaving', dataType: 'string', disablePadding: false,
                 render: (row, column) => {
-					return `${row[column.dataKey].toFixed(2)}%` 
+					return row[column.dataKey] ? `${row[column.dataKey].toFixed(2)}%`: '0%'
                 }
             }
         ] : []
@@ -56,9 +56,9 @@ const BuildingList = ({
 		},
 		...(parseInt(context.taxYear) >= 2023 ?
         [
-            { label: 'PW Rate', dataKey: 'percentSaving', dataType: 'string', disablePadding: false,
+            { label: 'PW Rate', dataKey: 'pwRate', dataType: 'string', disablePadding: false,
                 render: (row, column) => {
-					return `$${row['pwRate'].toFixed(2)}`;
+					return row['pwRate'] ? `$${row['pwRate'].toFixed(2)}` : '$0.00'
                 }
             }
         ] : []
