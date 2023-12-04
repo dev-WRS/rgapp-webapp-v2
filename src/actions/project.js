@@ -119,6 +119,17 @@ export const deleteProject = (id) => async (...args) => {
 	return { payload, error, ...others }
 }
 
+export const deleteProjects = (data) => async (...args) => {
+	const { payload, error, ...others } = await actionRequest(...args)({
+		type: Types.DELETE_PROJECTS,
+		url: '/projects/deleteProjects',
+		method: 'delete',
+		data
+	})
+
+	return { payload, error, ...others }
+}
+
 export const createProjectPhoto = (id, data) => async (...args) => {
 	const { payload, error, ...others } = await actionRequest(...args)({
 		type: Types.CREATE_PROJECT_PHOTO,

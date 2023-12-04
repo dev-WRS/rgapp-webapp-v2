@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { useSelector } from 'react-redux'
+import _ from 'lodash'
 
 import MessageDialog from 'components/core/MessageDialog'
 import { deleteProject } from 'actions'
+import { deleteProjects } from 'actions'
 import { MSG_TYPE } from 'constants'
 
 const DeleteProject = ({
@@ -20,7 +22,8 @@ const DeleteProject = ({
 	}
 
 	const handleConfirm = async () => {
-		const { error } = await dispatch(deleteProject(selection[0].id))
+		// const { error } = await dispatch(deleteProject(selection[0].id))
+		const { error } = await dispatch(deleteProjects(_.map(selection, 'id')))
 
 		setOpen(false)
 
