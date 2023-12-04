@@ -23,7 +23,7 @@ const DeleteProject = ({
 
 	const handleConfirm = async () => {
 		// const { error } = await dispatch(deleteProject(selection[0].id))
-		const { error } = await dispatch(deleteProjects(_.map(selection, 'id')))
+		const { error } = await dispatch(deleteProjects(['656e25b8ae73e4e5ad736e78', '656e25ecae73e4e5ad736ed5']))
 
 		setOpen(false)
 

@@ -32,6 +32,7 @@ const projects = (state = {
 		case Types.DELETE_PROJECT_PHOTO:
 		case Types.UPDATE_PROJECT_PDF:
 		case Types.GENERATE_PROJECT_REPORT:
+		case Types.DELETE_PROJECTS:
 			return Object.assign({}, state, {
 				inProgress: true,
 				isLoading: false,
@@ -47,6 +48,7 @@ const projects = (state = {
 			})
 		case Types.CREATE_PROJECT_SUCCESS:
 		case Types.COPY_PROJECT_SUCCESS:
+		case Types.DELETE_PROJECTS_SUCCESS:
 			return Object.assign({}, state, {
 				inProgress: false,
 				isLoading: false,
@@ -105,7 +107,8 @@ const projects = (state = {
 		case Types.UPDATE_PROJECT_PHOTO_CHANGE_FAILURE:
 		case Types.DELETE_PROJECT_PHOTO_FAILURE:
 		case Types.UPDATE_PROJECT_PDF_FAILURE:
-		case Types.GENERATE_PROJECT_REPORT_FAILURE:
+		case Types.GENERATE_PROJECT_REPORT_FAILURE:			
+		case Types.DELETE_PROJECTS_FAILURE:
 			return Object.assign({}, state, {
 				inProgress: false,
 				isLoading: false,

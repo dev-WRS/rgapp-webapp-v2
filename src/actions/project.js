@@ -123,7 +123,8 @@ export const deleteProjects = (data) => async (...args) => {
 	const { payload, error, ...others } = await actionRequest(...args)({
 		type: Types.DELETE_PROJECTS,
 		url: '/projects/deleteProjects',
-		method: 'delete',
+		headers: { 'Content-Type': 'application/json' },
+		method: 'post',
 		data
 	})
 

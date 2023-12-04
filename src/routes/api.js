@@ -62,6 +62,7 @@ const apiRoutes = [
 	{ url: '/projects/:id', method: 'get' },
 	{ url: '/projects/:id', method: 'put' },
 	{ url: '/projects/:id', method: 'delete' },
+	{ url: '/projects/deleteProjects', method: 'post'},
 
 	{ url: '/projects/:id/status', method: 'put' }, 
 	{ url: '/projects/:id/report', method: 'put' }, 
@@ -88,6 +89,7 @@ const apiRoutes = [
 	{ url: '/projects/:id/photos/:photoId', method: 'put' },
 	{ url: '/projects/:id/photos/:photoId/change', method: 'put' },
 	{ url: '/projects/:id/photos/:photoId', method: 'delete' },
+	{ url: '/projects/:id/photos/deletePhotos', method: 'post' },
 
 	{ url: '/projects/:id/certificate45L', method: 'put' },
 	{ url: '/projects/:id/baselineDesign179D', method: 'put' },
