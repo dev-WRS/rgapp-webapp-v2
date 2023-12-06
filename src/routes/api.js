@@ -56,6 +56,7 @@ const apiRoutes = [
 	{ url: '/certifiers/:id', method: 'delete' },
 
 	{ url: '/projects', method: 'get' },
+	{ url: '/projects/reportsByDates', method: 'post'},
 	{ url: '/projects/:projectID/lookup', method: 'get' },
 	{ url: '/projects', method: 'post' },
 	{ url: '/projects/:id/copy', method: 'post' },

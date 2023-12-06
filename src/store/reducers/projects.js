@@ -7,6 +7,7 @@ const projects = (state = {
 }, action) => {
 	switch (action.type) {
 		case Types.FETCH_PROJECTS:
+		case Types.FETCH_PROJECTS_BY_REPORT_DATE:
 		case Types.FETCH_PROJECT_INFO:
 		case Types.FETCH_PROJECT:
 			return Object.assign({}, state, {
@@ -39,6 +40,7 @@ const projects = (state = {
 				didInvalidate: false
 			})
 		case Types.FETCH_PROJECTS_SUCCESS:
+		case Types.FETCH_PROJECTS_BY_REPORT_DATE_SUCCESS:
 			return Object.assign({}, state, {
 				inProgress: false,
 				isLoading: false,
@@ -86,6 +88,7 @@ const projects = (state = {
 				lastUpdated: action.receivedAt
 			})
 		case Types.FETCH_PROJECTS_FAILURE:
+		case Types.FETCH_PROJECTS_BY_REPORT_DATE_FAILURE:
 		case Types.FETCH_PROJECT_FAILURE:
 		case Types.FETCH_PROJECT_INFO_FAILURE:
 		case Types.CREATE_PROJECT_FAILURE:

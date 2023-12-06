@@ -246,6 +246,15 @@ const DataBrowser = ({
 								</span>
 							</Tooltip>
 						)}
+						<Tooltip title="Custom Delete" arrow>
+							<span>
+								<IconButton
+									sx={{ stroke: theme.palette.text.primary, strokeWidth: "15px" }}
+								>
+									<Icon icon="columns-2" color={theme.palette.text.primary} size={22} />
+								</IconButton>
+							</span>
+						</Tooltip>
 						<Tooltip title="Columns" arrow>
 							<span>
 								<IconButton

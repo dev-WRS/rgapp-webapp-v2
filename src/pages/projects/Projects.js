@@ -14,6 +14,7 @@ import DownloadReportProject from './DownloadReportProject'
 import OpenReportProject from './OpenReportProject'
 
 import { fetchProjects } from 'actions'
+import { fetchProjectByReportDates} from 'actions'
 import { MSG_TYPE } from 'constants'
 
 const Projects = () => {
@@ -44,6 +45,10 @@ const Projects = () => {
 	const handleRefresh = () => {
 		setLoading(true) 
 		dispatch(fetchProjects()).then(() => {
+			setTimeout(() => setLoading(false), 2000)
+		}).catch(() => setLoading(false))
+
+		dispatch(fetchProjectByReportDates('2022-08-01','2023-12-01')).then(() => {
 			setTimeout(() => setLoading(false), 2000)
 		}).catch(() => setLoading(false))
 	}

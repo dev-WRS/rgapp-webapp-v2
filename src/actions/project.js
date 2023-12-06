@@ -11,6 +11,18 @@ export const fetchProjects = () => async (...args) => {
 	return { payload, error, ...others }
 }
 
+export const fetchProjectByReportDates = (startDate, endDate) => async (...args) => {
+	const { payload, error, ...others } = await actionRequest(...args)({
+		type: Types.FETCH_PROJECTS_BY_REPORT_DATE,
+		url: `/projects/reportsByDates`,
+		headers: { 'Content-Type': 'application/json' },
+		method: 'post',
+		data: { startDate, endDate }
+	})
+
+	return { payload, error, ...others }
+}
+
 export const fetchProjectInfo = (projectID) => async (...args) => {
 	const { payload, error, ...others } = await actionRequest(...args)({
 		type: Types.FETCH_PROJECT_INFO,
