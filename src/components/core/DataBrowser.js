@@ -14,6 +14,7 @@ import DataFilters, { operators } from 'components/core/DataFilters'
 import Actions from 'components/core/Actions'
 import Action from 'components/core/Action'
 import Snackbar from 'components/core/Snackbar'
+import DeleteByDateForm from 'components/DeleteByDateForm'
 
 import { hexid } from 'helpers'
 import { MSG_TYPE } from 'constants'
@@ -98,6 +99,7 @@ const DataBrowser = ({
 	const [currentActionState, setCurrentActionState] = useState()
 	const [openMsgState, setOpenMsgState] = useState(false)
 	const [msgState, setMsgState] = useState()
+	const [openDialog, setOpenDialog] = useState(false)
 
 	useEffect(() => {
 		(rows && rows.length > 0) && setSelectionState(prevSelection => prevSelection.reduce((result, { id }) => {
@@ -106,6 +108,9 @@ const DataBrowser = ({
 			return result
 		}, []))
 	}, [rows])
+
+	const handleDeleteByDateDialog = () => setOpenDialog(true)
+	const handleCloseDialog = () => setOpenDialog(false)
 
 	const handleSearch = (criteria) => {
 		setSearchState({ criteria, props: searchables ? searchables.map(({ property }) => property) : [] })
@@ -249,18 +254,10 @@ const DataBrowser = ({
 						<Tooltip title="Custom Delete" arrow>
 							<span>
 								<IconButton
-									sx={{ stroke: theme.palette.text.primary, strokeWidth: "15px" }}
+									onClick={handleDeleteByDateDialog}
+									sx={{ marginRight: .5, marginLeft: .5, stroke: theme.palette.text.primary, strokeWidth: "15px" }}
 								>
-									<Icon icon="columns-2" color={theme.palette.text.primary} size={22} />
-								</IconButton>
-							</span>
-						</Tooltip>
-						<Tooltip title="Columns" arrow>
-							<span>
-								<IconButton
-									sx={{ stroke: theme.palette.text.primary, strokeWidth: "15px" }}
-								>
-									<Icon icon="columns-2" color={theme.palette.text.primary} size={22} />
+									<Icon icon="broom" color={theme.palette.text.primary} size={22} />
 								</IconButton>
 							</span>
 						</Tooltip>
@@ -307,6 +304,12 @@ const DataBrowser = ({
 						{msgState.message}
 					</Alert>
 				</Snackbar>
+			)}
+			{openDialog && (
+				<DeleteByDateForm
+					open={openDialog}
+					onCancel={handleCloseDialog}
+				/>
 			)}
 		</>
 	)
