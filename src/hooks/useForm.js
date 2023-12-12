@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import moment from 'moment'
 
 const defaultInvalidMessage = 'This field is invalid'
 const validators = {
@@ -61,6 +62,18 @@ const validators = {
         test: value => value.length > 0,
         message: (name, value) => 'The list should have at least one element'
     },
+	isAfter: {
+		test: (value, fieldValidator, values) => (value && fieldValidator.name) ? !(moment(value).startOf('day').isAfter(moment(values[fieldValidator.name]).startOf('day'))) : true,
+		message: (name, value, fieldValidator) => fieldValidator.message || defaultInvalidMessage
+	},
+	isBefore: {
+		test: (value) => (value) ? !(moment(value).startOf('day').isBefore(moment().startOf('day').clone().subtract(5, 'years').format('YYYY-MM-DD'))) : true,
+		message: (name, value, fieldValidator) => fieldValidator.message || defaultInvalidMessage
+	},
+	futureDate: {
+		test: (value) => (value) ? !(moment(value).startOf('day').isAfter(moment().startOf('day'))) : true,
+		message: (name, value, fieldValidator) => fieldValidator.message || defaultInvalidMessage
+	},
 }
 
 const validate = validations => values => {

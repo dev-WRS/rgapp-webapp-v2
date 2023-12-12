@@ -73,7 +73,9 @@ const DataBrowser = ({
 	onSelectionChange,
 	onAction,
 	onActionClose,
-	showTotalType
+	showTotalType,
+	dialogOpened,
+	origin
 }) => {
 	const theme = useTheme()
 	const searchables = useMemo(() => columns
@@ -109,9 +111,14 @@ const DataBrowser = ({
 		}, []))
 	}, [rows])
 
-	const handleDeleteByDateDialog = () => setOpenDialog(true)
-	const handleCloseDialog = () => setOpenDialog(false)
-
+	const handleDeleteByDateDialog = () => {
+		setOpenDialog(true)
+		dialogOpened(true)
+	}
+	const handleCloseDialog = () => {
+		setOpenDialog(false)
+		dialogOpened(false)
+	}
 	const handleSearch = (criteria) => {
 		setSearchState({ criteria, props: searchables ? searchables.map(({ property }) => property) : [] })
 	}
@@ -251,13 +258,24 @@ const DataBrowser = ({
 								</span>
 							</Tooltip>
 						)}
-						<Tooltip title="Custom Delete" arrow>
+						{ (origin && origin === 'projects') && (
+							<Tooltip title="Custom Delete" arrow>
 							<span>
 								<IconButton
 									onClick={handleDeleteByDateDialog}
 									sx={{ marginRight: .5, marginLeft: .5, stroke: theme.palette.text.primary, strokeWidth: "15px" }}
 								>
 									<Icon icon="broom" color={theme.palette.text.primary} size={22} />
+								</IconButton>
+							</span>
+							</Tooltip>
+						)}
+						<Tooltip title="Columns" arrow>
+							<span>
+								<IconButton
+									sx={{ stroke: theme.palette.text.primary, strokeWidth: "15px" }}
+								>
+									<Icon icon="columns-2" color={theme.palette.text.primary} size={22} />
 								</IconButton>
 							</span>
 						</Tooltip>

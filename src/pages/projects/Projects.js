@@ -14,14 +14,21 @@ import DownloadReportProject from './DownloadReportProject'
 import OpenReportProject from './OpenReportProject'
 
 import { fetchProjects } from 'actions'
-import { fetchProjectByReportDates} from 'actions'
 import { MSG_TYPE } from 'constants'
 
 const Projects = () => {
 	const dispatch = useDispatch()
 	const auth = useSelector(state => state.auth && state.auth.data)
+	const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+	const [loadedProjects, setLoadedProjects] = useState([])
 	const permissions = useSelector(state => state.permissions && state.permissions.data)
-	const projects = useSelector(state => state.projects && state.projects.data)
+	const projects = useSelector(state => { 
+		if (!deleteDialogOpen) {
+			return state.projects && state.projects.data 
+		} else {
+			return loadedProjects
+		}
+	})
 	const [isLoading, setLoading] = useState(false)
 	const actions = useMemo(() => [
 		{ key: 'add-projects', label: 'Add', icon: 'plus', element: AddProject },
@@ -47,16 +54,23 @@ const Projects = () => {
 		dispatch(fetchProjects()).then(() => {
 			setTimeout(() => setLoading(false), 2000)
 		}).catch(() => setLoading(false))
-
-		dispatch(fetchProjectByReportDates('2022-08-01','2023-12-01')).then(() => {
-			setTimeout(() => setLoading(false), 2000)
-		}).catch(() => setLoading(false))
 	}
 	const handleActionClose = (action, result) => {
 		if (result && result.type !== MSG_TYPE.error) {
 			setLoading(true)
 			dispatch(fetchProjects()).then(() => {
 				setTimeout(() => setLoading(false), 2000)
+			}).catch(() => setLoading(false))
+		}
+	}
+	const handleDialogOpened = (dialog) => {
+		setDeleteDialogOpen(dialog)	
+		if (dialog) {	
+			setLoadedProjects(projects)
+		} else {
+			setLoading(true) 
+			dispatch(fetchProjects()).then(() => {
+				setLoading(false)
 			}).catch(() => setLoading(false))
 		}
 	}
@@ -70,6 +84,7 @@ const Projects = () => {
 			onRefresh={handleRefresh}
 			onActionClose={handleActionClose}
 			isLoading={isLoading}
+			dialogOpened={handleDialogOpened}
 		/>
 	)
 }
