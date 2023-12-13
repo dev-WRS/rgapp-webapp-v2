@@ -7,12 +7,13 @@ import useForm from 'hooks/useForm'
 import TextField from 'components/core/TextField'
 import moment from 'moment'
 import { useDispatch } from 'react-redux'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 import Button from 'components/core/Button'
 import LoadingButton from 'components/core/LoadingButton'
 import { fetchProjectByReportDates} from 'actions'
 import { deleteProjects } from 'actions'
+import { set } from 'lodash'
 
 const validations = {
     startDate: ['required',
@@ -41,6 +42,22 @@ const DeleteByDateForm = ({
     const minStartDate = currentDate.clone().subtract(1, 'years').format('YYYY-MM-DD')
     const [projects, setProjects] = useState([])
     const [isLoading, setIsLoading] = useState(false)
+    const [operationSuccessfully, setOperationSuccessfully] = useState(null)
+    const [dialogContextText, setDialogContextText] = useState(['Found', 'Are you sure you want to proceed with the deletion?' ])
+
+    useEffect(() => {
+        switch (operationSuccessfully) {
+            case true:
+                setDialogContextText(['Deleted', ''])
+                break
+            case false:
+                setDialogContextText(['Error at Delete', 'Please contact support!']) 
+                break
+            default:
+                setDialogContextText(['Found', 'Are you sure you want to proceed with the deletion?'])  
+                break
+        }
+	}, [operationSuccessfully])
 
     const { state, formValidate, getError, onValueChange, onBlur } = useForm(
         { initialState: {
@@ -62,8 +79,15 @@ const DeleteByDateForm = ({
             if (projects && projects.length > 0) {
                 const ids = projects.map(project => project.id);
                 if (ids && ids.length > 0) {
-                    const { error } = dispatch(deleteProjects(ids))
-                    console.log("Error:", error)  
+                    dispatch(deleteProjects(ids)).then(() => {
+                        setTimeout(() => {
+                            setIsLoading(false)
+                            setOperationSuccessfully(true)
+                        } , 10000)
+                    }).catch(() => {
+                        setIsLoading(false)                        
+                        setOperationSuccessfully(false)
+                    })
                 } else {
                     console.log("No projects to delete")
                 }
@@ -120,7 +144,7 @@ const DeleteByDateForm = ({
                     {
                         (projects && projects.length > 0) && (
                             <DialogContentText>
-                                Found {projects.length} projects with reports created between {moment(state.startDate).format('MMMM DD, YYYY')}, and {moment(state.startDate).format('MMMM DD, YYYY')}. Are you sure you want to proceed with the deletion?
+                                {dialogContextText[0]} {projects.length} projects with reports created between {moment(state.startDate).format('MMMM DD, YYYY')}, and {moment(state.startDate).format('MMMM DD, YYYY')}. {dialogContextText[1]}
                             </DialogContentText>
                         )
                     }
@@ -139,7 +163,7 @@ const DeleteByDateForm = ({
 						}}
 					>Cancel</Button>
                     {
-                        (projects === undefined || (projects && projects.length === 0)) && (
+                        (projects === undefined || (projects && projects.length === 0) || (operationSuccessfully === null || operationSuccessfully === true)) && (
                             <LoadingButton type="submit" variant="contained" color="secondary"
                             disabled={isLoading}
                             loading={isLoading}
@@ -150,7 +174,7 @@ const DeleteByDateForm = ({
                         >Search </LoadingButton>
                         )}
                     {
-                        (projects && projects.length > 0) && (
+                        ((projects && projects.length > 0) || operationSuccessfully === false) && (
                             <LoadingButton type="submit" variant="contained" color="secondary"
                             disabled={isLoading}
                             loading={isLoading}
