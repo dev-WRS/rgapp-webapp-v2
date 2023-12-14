@@ -13,7 +13,6 @@ import Button from 'components/core/Button'
 import LoadingButton from 'components/core/LoadingButton'
 import { fetchProjectByReportDates} from 'actions'
 import { deleteProjects } from 'actions'
-import { set } from 'lodash'
 
 const validations = {
     startDate: ['required',
@@ -42,8 +41,10 @@ const DeleteByDateForm = ({
     const minStartDate = currentDate.clone().subtract(1, 'years').format('YYYY-MM-DD')
     const [projects, setProjects] = useState([])
     const [isLoading, setIsLoading] = useState(false)
+    const [isSearching, setIsSearching] = useState(false)
     const [operationSuccessfully, setOperationSuccessfully] = useState(null)
-    const [dialogContextText, setDialogContextText] = useState(['Found', 'Are you sure you want to proceed with the deletion?' ])
+    const [deletedItems, setDeletedItems] = useState(0)
+    const [dialogContextText, setDialogContextText] = useState(['Found', 'Are you sure you want to proceed with the deletion?'])
 
     useEffect(() => {
         switch (operationSuccessfully) {
@@ -70,6 +71,7 @@ const DeleteByDateForm = ({
     const handleDateChange = (event) => {
         onValueChange({ target: { id: event.target.id, value: event.target.value } })
         setProjects([])
+        setOperationSuccessfully(null)
     }
 
     const handleSubmit = event => {
@@ -83,6 +85,8 @@ const DeleteByDateForm = ({
                         setTimeout(() => {
                             setIsLoading(false)
                             setOperationSuccessfully(true)
+                            setDeletedItems(projects.length)
+                            setProjects([]);
                         } , 10000)
                     }).catch(() => {
                         setIsLoading(false)                        
@@ -91,25 +95,29 @@ const DeleteByDateForm = ({
                 } else {
                     console.log("No projects to delete")
                 }
-            } else {
-                dispatch(fetchProjectByReportDates(state.startDate, state.endDate))
-                .then(({ payload, error, ...others }) => {
-                    if (error) {
-                        console.error("Error fetching projects:", error)
-                        setIsLoading(false)
-                        return
-                    }
-                    setProjects(payload)
-                    setTimeout(() => setIsLoading(false), 2000)
-                    setIsLoading(false)
-                })
-                .catch((error) => {
-                    console.error(`Error fetching projects. Timeout reached. ${error}`)
-                    setIsLoading(false);
-                });
             }
 		}
 	}
+
+    const onSearch = event => {
+		event.preventDefault()
+        if (formValidate()) {
+            setIsSearching(true);
+            setOperationSuccessfully(null)
+            dispatch(fetchProjectByReportDates(state.startDate, state.endDate))
+            .then(({ payload, error, ...others }) => {
+                if (error) {
+                    setIsSearching(false)
+                    return
+                }
+                setProjects(payload)
+                setIsSearching(false)
+            })
+            .catch((error) => {
+                setIsSearching(false);
+            });
+        }
+    }
 
     return (
         <Dialog open={open}>
@@ -119,13 +127,13 @@ const DeleteByDateForm = ({
                     top: '10px',
 					padding: '0px 24px',
 					width: 400,
-                    height: projects.length > 0 ? 280 : 200
+                    height: projects.length > 0 || operationSuccessfully !== null ? 280 : 200
 				}}>
                     <TextField type="date" id="startDate" label="Start Date"
 						fullWidth
                         value={state.startDate}
 						size="medium"
-						disabled={isLoading}
+						disabled={isLoading || isSearching}
 						onChange={handleDateChange}
 						onBlur={onBlur}
                         sx={{margin: '5px 0px 0px'}}
@@ -135,16 +143,16 @@ const DeleteByDateForm = ({
 						fullWidth
                         value={state.endDate}
 						size="medium"
-						disabled={isLoading}
+						disabled={isLoading || isSearching}
 						onChange={handleDateChange}
 						onBlur={onBlur}
                         sx={{margin: '5px 0px 0px'}}
 						{...getError('endDate')}
 					/>
                     {
-                        (projects && projects.length > 0) && (
+                        (projects.length > 0 || operationSuccessfully !== null) && (
                             <DialogContentText>
-                                {dialogContextText[0]} {projects.length} projects with reports created between {moment(state.startDate).format('MMMM DD, YYYY')}, and {moment(state.startDate).format('MMMM DD, YYYY')}. {dialogContextText[1]}
+                                {dialogContextText[0]} {projects.length > 0 ? projects.length : deletedItems} projects with reports created between {moment(state.startDate).format('MMMM DD, YYYY')}, and {moment(state.startDate).format('MMMM DD, YYYY')}. {dialogContextText[1]}
                             </DialogContentText>
                         )
                     }
@@ -156,27 +164,28 @@ const DeleteByDateForm = ({
 					paddingBottom: 3
 				}}>
 					<Button variant="outlined" onClick={onCancel}
-						disabled={isLoading}
+						disabled={isLoading || isSearching}
 						color="cancel"
 						sx={{
 							flex: 1
 						}}
 					>Cancel</Button>
                     {
-                        (projects === undefined || (projects && projects.length === 0) || (operationSuccessfully === null || operationSuccessfully === true)) && (
-                            <LoadingButton type="submit" variant="contained" color="secondary"
-                            disabled={isLoading}
-                            loading={isLoading}
+                        (projects.length === 0 || operationSuccessfully === null || operationSuccessfully === true) && (
+                            <LoadingButton variant="contained" color="secondary"
+                            disabled={isLoading || isSearching}
+                            loading={isSearching}
                             sx={{
                                 color: 'white',
                                 flex: 1
                             }}
+                            onClick={onSearch}
                         >Search </LoadingButton>
                         )}
                     {
-                        ((projects && projects.length > 0) || operationSuccessfully === false) && (
+                        (projects.length > 0 || operationSuccessfully === false) && (
                             <LoadingButton type="submit" variant="contained" color="secondary"
-                            disabled={isLoading}
+                            disabled={isLoading || isSearching}
                             loading={isLoading}
                             sx={{
                                 color: 'white',
