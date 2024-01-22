@@ -7,6 +7,7 @@ import MuiTableHead from '@mui/material/TableHead'
 import MuiTableRow from '@mui/material/TableRow'
 import TableSortLabel from '@mui/material/TableSortLabel'
 import Checkbox from '@mui/material/Checkbox'
+import moment from 'moment'
 
 
 const TableRow = styled(MuiTableRow)(({ theme }) => ({
@@ -21,14 +22,18 @@ const TableRow = styled(MuiTableRow)(({ theme }) => ({
 const defaultSorter = { direction: 'asc' }
 
 const compare = (a, b, property) => {
-	if (b[property] < a[property]) {
-		return -1
-	}
-	if (b[property] > a[property]) {
-		return 1
-	}
-	return 0
-}
+    if (property === 'createDate' || property === 'reportCreateDate') {
+        const dateA = moment(a[property]);
+        const dateB = moment(b[property]);
+        if (dateA.isBefore(dateB)) return -1;
+        if (dateA.isAfter(dateB)) return 1;
+        return 0;
+    } else {
+        if (a[property] < b[property]) return -1;
+        if (a[property] > b[property]) return 1;
+        return 0;
+    }
+};
 
 const stableSort = (items, cmp) => {
 	const stabilizedThis = items.map((item, index) => [item, index])
