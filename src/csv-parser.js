@@ -36,7 +36,7 @@ const parser = async (file, options = {}) => {
 		const secondarySep = secondarySeparator || ( sep === ',' ? ';' : ',')
 
 		if (lines[index]) {
-			headers = lines[index].replace(/(\r\n|\n|\r)/gm, '').split(sep)
+			headers = lines[index].replace(/(\r\n|\n|\r)/gm, '').toLowerCase().split(sep).map(header => header.trim())
 			index++
 		}
 
@@ -50,7 +50,7 @@ const parser = async (file, options = {}) => {
 							item[name] = sanitized.split(secondarySep)
 						}
 						else {
-							item[name] = values[i]
+							item[name] = values[i].trim()
 						}
 						return item
 					}, {})

@@ -5,6 +5,7 @@ import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
+import moment from 'moment'
 
 import Popover from '@mui/material/Popover'
 
@@ -143,7 +144,9 @@ const FilterDialog = ({
 
 	const handleValueChange = (event) => {
 		const transform = transformValue[filter.dataType]
-		setValue(transform ? transform(event.target.value) : event.target.value)
+		setValue(transform 
+			? filter.dataType === 'date' ? moment(transform(event.target.value)).startOf('day').format('MM/DD/YYYY') : transform(event.target.value) 
+			: event.target.value)
 	}
 
 	const handleKeyPress = (event) => {

@@ -7,6 +7,7 @@ import Tooltip from '@mui/material/Tooltip'
 import IconButton from '@mui/material/IconButton'
 import Alert from '@mui/material/Alert'
 import Typography from '@mui/material/Typography'
+import moment from 'moment'
 
 import DataTable from 'components/core/DataTable'
 import Spinner from 'components/core/Spinner'
@@ -29,7 +30,23 @@ const filterFn = filters => item => {
 	while (result === true && i < ln) {
 		const filter = filters[i]
 		const itemValue = filter.column && filter.column.calculate ? filter.column.calculate(item) : item[filter.property]
-		result = result && operators[filter.operator].fn(filter.value, itemValue, filter.dataType)
+        if (filter.dataType === 'date') {
+			console.log('filter.value', filter.value)
+			console.log('itemValue', itemValue)
+
+            const formattedFilterValue = moment(filter.value).startOf('day').format('MM/DD/YYYY HH:mm');
+            const formattedItemValue = moment(itemValue).startOf('day').format('MM/DD/YYYY HH:mm');
+
+			console.log('formattedFilterValue', formattedFilterValue)
+			if (formattedItemValue === '01/19/2024 00:00') {
+				console.log('formattedItemValue', formattedItemValue)
+			}
+
+            result = result && operators[filter.operator].fn(formattedFilterValue, formattedItemValue, filter.dataType);
+			if (result === true) console.log('result', result)
+        } else {
+			result = result && operators[filter.operator].fn(filter.value, itemValue, filter.dataType)
+		}
 		i++
 	}
 	return result
