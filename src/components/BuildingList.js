@@ -23,6 +23,16 @@ const buildingValidate = (building) => {
 		!!method
 }
 
+const buildingValidate2023 = (building) => {
+	const { name, type, address, area, categories, percentsaving } = building
+	return !!name && 
+		!!type && 
+		!!address &&
+		!!categories &&
+		!!area &&
+		!!percentsaving
+}
+
 const BuildingList = ({
 	context,
 	actions,
@@ -51,7 +61,7 @@ const BuildingList = ({
     	),
 		{ label: 'Rate', dataKey: 'rate', dataType: 'string', disablePadding: false, 
 			render: (row, column) => {
-				return `$${row[column.dataKey].toFixed(2)}`
+				return row[column.dataKey] ? `$${row[column.dataKey].toFixed(2)}` : '$0.00'
 			}
 		},
 		...(parseInt(context.taxYear) >= 2023 ?
@@ -72,7 +82,28 @@ const BuildingList = ({
 		setOpenState(true)
 	}
 
+    const parseIntSafe = (value) => {
+        if (!value) return 0;
+        const parsed = parseInt(value, 10);
+        return isNaN(parsed) ? 0 : parsed;
+    }
+
 	const handleValueChange = async (data) => {
+		for (let i = 0; i < data.length; i++) {
+			let newRate = 0
+			let pwNewRate = 0
+			const percentSaving = parseIntSafe(data[i].percentsaving)
+			if (parseInt(context.taxYear) === 2023) {
+				newRate = percentSaving > 0 ? Math.min((((Math.ceil(percentSaving))/100 - 0.25) * 100) * 0.0212 + 0.54, 1.07) : 0
+				pwNewRate = percentSaving > 0 ? Math.min((((Math.ceil(percentSaving))/100 - 0.25) * 100) * 0.11 + 2.68, 5.36) : 0
+			} else if (parseInt(context.taxYear) > 2023) {
+				newRate = percentSaving > 0 ? Math.min((((Math.ceil(percentSaving))/100 - 0.25) * 100) * 0.0224 + 0.57, 1.13) : 0
+				pwNewRate = percentSaving > 0 ? Math.min((((Math.ceil(percentSaving))/100 - 0.25) * 100) * 0.1128 + 2.83, 5.65) : 0
+			}
+			data[i].rate = newRate
+			data[i].pwRate = pwNewRate
+			data[i].percentSaving = percentSaving
+		}
 		const { error } = await dispatch(createBuilding(context.id, data))
 
 		if (error) {
@@ -143,7 +174,7 @@ const BuildingList = ({
 			) : (
 				<>
 					<EnterDataOptions
-						csvOptions={{ validate: buildingValidate }}
+						csvOptions={{ validate: parseInt(context.taxYear) >= 2023 ? buildingValidate2023 : buildingValidate }}
 						onValueChange={handleValueChange}
 						onEnterManually={handleEnterManually}
 					/>

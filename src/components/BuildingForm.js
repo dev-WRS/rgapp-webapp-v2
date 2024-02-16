@@ -65,8 +65,16 @@ const BuildingForm = ({
 		let newRate = null
 		let pwNewRate = null
 		if (parseInt(context.taxYear) >= 2023) {
-			newRate = buildingDefaults.percentSaving && buildingDefaults.percentSaving > 0 ? Math.min((((Math.ceil(buildingDefaults.percentSaving))/100 - 0.25) * 100) * 0.0212 + 0.54, 1.07) : 0;
-			pwNewRate = buildingDefaults.percentSaving && buildingDefaults.percentSaving > 0 ? Math.min((((Math.ceil(buildingDefaults.percentSavings))/100 - 0.25) * 100) * 0.11 + 2.68, 5.36) : 0;
+			newRate = buildingDefaults.percentSaving && buildingDefaults.percentSaving > 0 
+						? parseInt(context.taxYear) === 2023
+							? Math.min((((Math.ceil(buildingDefaults.percentSaving))/100 - 0.25) * 100) * 0.0212 + 0.54, 1.07)
+							: Math.min((((Math.ceil(buildingDefaults.percentSaving))/100 - 0.25) * 100) * 0.0224 + 0.57, 1.13)
+						: 0;
+			pwNewRate = buildingDefaults.percentSaving && buildingDefaults.percentSaving > 0
+						? parseInt(context.taxYear) === 2023
+							? Math.min((((Math.ceil(buildingDefaults.percentSaving))/100 - 0.25) * 100) * 0.11 + 2.68, 5.36) 
+							: Math.min((((Math.ceil(buildingDefaults.percentSaving))/100 - 0.25) * 100) * 0.1128 + 2.83, 5.65)
+						: 0;
 
 			calculatedDefaults = {
 				method: '',
