@@ -60,20 +60,34 @@ const BuildingForm = ({
 		fields = ['name', 'type', 'address', 'qualifyingCategories', 'area', 'rate', 'method', 'totalWatts', 'percentReduction', 'savingsRequirement']
 	}
 
+	const calculateRateByYear = (percentSaving) => {
+		const multiplier1 = parseInt(context.taxYear) === 2023 ? 0.0212 : 0.0224;
+		const multiplier2 = parseInt(context.taxYear) === 2023 ? 0.54 : 0.57;
+		const multiplier3 = parseInt(context.taxYear) === 2023 ? 1.07: 1.13;
+
+		const result = Math.min((((Math.ceil(percentSaving))/100 - 0.25) * 100) * multiplier1 + multiplier2, multiplier3)
+		return result
+	}
+
+	const calculatePwRateByYear = (percentSaving) => {
+		const multiplier1 = parseInt(context.taxYear) === 2023 ? 0.11 : 0.1128;
+		const multiplier2 = parseInt(context.taxYear) === 2023 ? 2.68 : 2.83;
+		const multiplier3 = parseInt(context.taxYear) === 2023 ? 5.36 : 5.65;
+
+		const result = Math.min((((Math.ceil(percentSaving))/100 - 0.25) * 100) * multiplier1 + multiplier2, multiplier3)
+		return result
+	}
+
 	const calculateDefaults = (buildingDefaults, qualifyingCategories) => {
 		let calculatedDefaults = {}
 		let newRate = null
 		let pwNewRate = null
 		if (parseInt(context.taxYear) >= 2023) {
 			newRate = buildingDefaults.percentSaving && buildingDefaults.percentSaving > 0 
-						? parseInt(context.taxYear) === 2023
-							? Math.min((((Math.ceil(buildingDefaults.percentSaving))/100 - 0.25) * 100) * 0.0212 + 0.54, 1.07)
-							: Math.min((((Math.ceil(buildingDefaults.percentSaving))/100 - 0.25) * 100) * 0.0224 + 0.57, 1.13)
+						? calculateRateByYear(buildingDefaults.percentSaving)
 						: 0;
 			pwNewRate = buildingDefaults.percentSaving && buildingDefaults.percentSaving > 0
-						? parseInt(context.taxYear) === 2023
-							? Math.min((((Math.ceil(buildingDefaults.percentSaving))/100 - 0.25) * 100) * 0.11 + 2.68, 5.36) 
-							: Math.min((((Math.ceil(buildingDefaults.percentSaving))/100 - 0.25) * 100) * 0.1128 + 2.83, 5.65)
+						? calculatePwRateByYear(buildingDefaults.percentSaving)
 						: 0;
 
 			calculatedDefaults = {
@@ -92,27 +106,28 @@ const BuildingForm = ({
 				const isNotJustLighting = !(qualifyingCategories.length === 1 && qualifyingCategories[0] === 'Lighting')
 	
 				const newMethod = isNotJustLighting ? 'Permanent' : method
-				const newQualifyingCategory = qualifyingCategories.length === 3 
-												? ['Whole Building']
-												: qualifyingCategories.length === 1 && qualifyingCategories[0] === 'HVAC + L'
-												? ['HVAC', 'Lighting']
-												: qualifyingCategories.length === 1 && qualifyingCategories[0] === 'HVAC + ENV'
-												? ['HVAC', 'Envelope']
-												: qualifyingCategories.length === 1 && qualifyingCategories[0] === 'L + ENV'
-												? ['Lighting', 'Envelope']
-												: qualifyingCategories
-	
-				let newSavingsRequirement = null 
-				let qualifiedDeduction = null
-				
-	
-				newSavingsRequirement = newQualifyingCategory.reduce((acc,curr) => {
+				let newQualifyingCategory = qualifyingCategories;
+
+				if (qualifyingCategories.length === 3) {
+					newQualifyingCategory = ['Whole Building'];
+				} else if (qualifyingCategories.length === 1 && qualifyingCategories[0] === 'HVAC + L') {
+					newQualifyingCategory = ['HVAC', 'Lighting'];
+				} else if (qualifyingCategories.length === 1 && qualifyingCategories[0] === 'HVAC + ENV') {
+					newQualifyingCategory = ['HVAC', 'Envelope'];
+				} else if (qualifyingCategories.length === 1 && qualifyingCategories[0] === 'L + ENV') {
+					newQualifyingCategory = ['Lighting', 'Envelope'];
+				}
+
+				let newSavingsRequirement = null;
+				let qualifiedDeduction = null;
+
+				newSavingsRequirement = newQualifyingCategory.reduce((acc, curr) => {
 					qualifiedDeduction = deductions.find(item => item.taxYear <= parseInt(context.taxYear) 
-														 && item.method === newMethod && item.qualifyingCategory === curr) || deductions.slice(-1)
-					newRate = qualifiedDeduction.taxDeduction
-	
-					return (acc[curr] = qualifiedDeduction.savingsRequirement,acc)
-				}, {})
+														 && item.method === newMethod && item.qualifyingCategory === curr) || deductions.slice(-1);
+					newRate = qualifiedDeduction.taxDeduction;
+
+					return (acc[curr] = qualifiedDeduction.savingsRequirement, acc);
+				}, {});
 	
 				if (newQualifyingCategory.length === 2) {
 					newRate *= 2
@@ -134,16 +149,28 @@ const BuildingForm = ({
 	const fieldsInitial = useMemo(() => {
 		return fields.reduce((result, name) => {
 			if (parseInt(context.taxYear) < 2023) {
-				result[name] = (mode === 'edit' && record[name]) ? record[name] : (buildingDefaults ? buildingDefaults[name] : '')
+				result[name] = (mode === 'edit' && record[name]) ? record[name] : (buildingDefaults ? buildingDefaults[name] : '');
 			} else {
 				if ((name === 'pwRate' || name === 'percentSaving') && (!record || !record['percentSaving'])) {
-					result['pwRate'] = 0
-					result['rate'] = 0
-					result['percentSaving'] = 0
+					result['pwRate'] = 0;
+					result['rate'] = 0;
+					result['percentSaving'] = 0;
 				} else {
-					result[name] = (mode === 'edit' && record[name]) ? record[name] : (buildingDefaults ? buildingDefaults[name] : '')
+					result[name] = (mode === 'edit' && record[name]) ? record[name] : (buildingDefaults ? buildingDefaults[name] : '');
+				}
+
+				if (name === 'qualifyingCategories' && (!record || record['qualifyingCategories'] !== undefined)) {
+					let qualifyingCategories;
+					if (mode === 'edit') {
+						qualifyingCategories = record['qualifyingCategories'] ? record['qualifyingCategories'] : buildingDefaults['qualifyingCategories'];
+					} else {
+						qualifyingCategories = buildingDefaults ? buildingDefaults['qualifyingCategories'] : ['Whole Building'];
+					}
+		
+					result['qualifyingCategories'] = qualifyingCategories;
 				}
 			}
+
 			return result
 		}, {})
 	}, [mode, record, buildingDefaults, context])
