@@ -54,7 +54,7 @@ const BuildingList = ({
         [
             { label: '% Saving', dataKey: 'percentSaving', dataType: 'string', disablePadding: false,
                 render: (row, column) => {
-					return row[column.dataKey] ? `${row[column.dataKey].toFixed(2)}%`: '0%'
+					return row[column.dataKey] ? `${row[column.dataKey].toFixed(2)}%`: '0.00%'
                 }
             }
         ] : []
@@ -84,7 +84,7 @@ const BuildingList = ({
 
     const parseIntSafe = (value) => {
         if (!value) return 0;
-        const parsed = parseInt(value, 10);
+        const parsed = parseFloat(value, 10);
         return isNaN(parsed) ? 0 : parsed;
     }
 
