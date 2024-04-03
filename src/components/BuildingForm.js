@@ -48,6 +48,7 @@ const BuildingForm = ({
 	const deductions = useSelector(state => state.deductions && state.deductions.data)
 	const lpds = useSelector(state => state.lpds && state.lpds.data)
 	const mode = useMemo(() => (record && record.id ? 'edit' : 'add'), [record])
+	const taxYear = parseInt(context.taxYear)
 
 	if (parseInt(context.taxYear) >= 2023) {
 		fields = ['name', 'type', 'address', 'qualifyingCategories', 'area', 'rate', 'pwRate', 'percentSaving', 'savingsRequirement']
@@ -191,7 +192,7 @@ const BuildingForm = ({
 	const qualifyLightingCategory = state.qualifyingCategories && state.qualifyingCategories.length === 1 && state.qualifyingCategories[0] === 'Lighting'
 
 	useEffect(() => {
-		if (parseInt(context.taxYear) < 2023) {
+		if (taxYear < 2023) {
 			setValidationsState(prevState => {
 				const newState = { ...prevState }
 				
@@ -203,7 +204,7 @@ const BuildingForm = ({
 				return newState
 			})
 		}
-	}, [state.method, context, formValidate])
+	}, [state.method])
 
 	const handleSubmit = async (event) => {
 		event.preventDefault()
@@ -216,7 +217,7 @@ const BuildingForm = ({
 
 	const handleQualifyingCategoriesChange = (event) => {
 		const value = event.target.value
-		const isNotJustLighting = !(value.length === 1 && state.qualifyingCategories[0] === 'Lighting')
+		const isNotJustLighting = !(value.length === 1 && state.qualifyingCategories && state.qualifyingCategories[0] === 'Lighting')
 
 		const newTotalWatts = isNotJustLighting ? '' : state.totalWatts
 		const newPercentReduction = isNotJustLighting ? '' : state.percentReduction

@@ -13,6 +13,7 @@ import Alert from '@mui/material/Alert'
 import TextField from 'components/core/TextField'
 import IconButton from 'components/core/IconButton'
 import PhotoGallery from 'components/core/PhotoGallery'
+import SelectPhotoDescriptionField from 'components/core/SelectPhotoDescriptionField'
 
 import InputFile from 'components/core/InputFile'
 import { useTheme } from '@emotion/react'
@@ -38,6 +39,7 @@ const PhotosList = ({
 	const [photo, setPhoto] = useState(null)
 	const [newPhoto, setNewPhoto] = useState(null)
 	const [selectionIndex, setSelectionIndex] = useState(-1)
+	const [description, setDescription] = useState(photo && photo.description ? photo.description : '');
 
 	useEffect(() => {
 		setOpenErrorMsg(error ? true : false)	
@@ -52,6 +54,7 @@ const PhotosList = ({
 				setNewPhoto(null)
 				setPhoto(null)
 				setSelectionIndex(-1)
+				setDescription('')
 			}
 		}, 1000)
 
@@ -60,13 +63,17 @@ const PhotosList = ({
 	const handleErrorMsgClose = () => setOpenErrorMsg(false)
 
 	const handleAdd = () => {
+		photo.description = description
 		onAdd && onAdd({ ...photo })
 		setPhoto(null)
+		setDescription('')
 		setSelectionIndex(-1)
 	}
 
 	const handleUpdate = () => {
+		photo.description = description
 		onUpdate && onUpdate({ ...photo })
+		setDescription('')
 		setPhoto(null)
 		setSelectionIndex(-1)
 	}
@@ -75,6 +82,7 @@ const PhotosList = ({
 		event.stopPropagation()
 		const selectedPhoto = photos[index]
 		onDelete && onDelete(selectedPhoto)
+		setDescription('')
 	}
 
 	const handleOpen = () => {
@@ -90,9 +98,11 @@ const PhotosList = ({
 		if (index === selectionIndex) {
 			setPhoto(null)
 			setSelectionIndex(-1)
+			setDescription('')
 		}
 		else {
 			const newPhoto = photos[index]
+			setDescription(newPhoto.description)
 
 			setSelectionIndex(index)
 			setPhoto({ ...newPhoto })
@@ -106,6 +116,7 @@ const PhotosList = ({
 		if (event.target.files.length === 0) {
 			setNewPhoto(null)
 			setPhoto(null)
+			setDescription('')
 		} else if (event.target.files.length === 1) {
 			const asset = event.target.files[0]
 			if (asset) {
@@ -117,23 +128,25 @@ const PhotosList = ({
 					} else {
 						setNewPhoto({ photo, asset })
 						setPhoto(null)				
-				}
+					}
+					setDescription(photo?.description ?? '')
 			} 
 		} else if (event.target.files.length > 1) {
 			setOpen(0)
 			const photosToUpload = []
 			forEach(event.target.files, (asset) => {
-				const description = ''
+				setDescription('')
 				photosToUpload.push({ description, asset })
 			})
 			onAddMultiple && onAddMultiple(photosToUpload)
 			setNewPhoto(null)
 			setPhoto(null)
+			setDescription('')
 		}
 	}
 
 	const handleDescriptionChange = (event) => {
-		const description = event.target.value
+		setDescription(event.target.value)
 		
 		if (photo) {
 			setPhoto({ ...photo, description })
@@ -143,12 +156,18 @@ const PhotosList = ({
 	return (
 		<Stack direction="column">
 			<Stack direction="row" spacing={2}>
-				<TextField id="description" label="Photo Description"
+				{/* <TextField id="description" label="Photo Description"
 					fullWidth
 					size={'medium'}
 					value={(photo && photo.description) || ''}
 					onChange={handleDescriptionChange}
 					disabled={inProgress || (newPhoto !== null)}
+				/> */}
+				<SelectPhotoDescriptionField id="description" label="Photo Description" disabled={inProgress}
+					fullWidth
+					size={'medium'}
+					value={description}
+					onChange={handleDescriptionChange}
 				/>
 				<Stack
 					direction='row'

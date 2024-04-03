@@ -42,6 +42,7 @@ const BuildingList = ({
 	onActionClose
 }) => {
 	const dispatch = useDispatch()
+	const taxYear = parseInt(context.taxYear)
 	const columns = useMemo(() => [
 		{ label: 'Name', dataKey: 'name', dataType: 'string', disablePadding: false, render: undefined },
 		{ label: 'Type', dataKey: 'type', dataType: 'string', disablePadding: false, render: undefined },
@@ -50,7 +51,7 @@ const BuildingList = ({
 				return `${row[column.dataKey].toLocaleString('en-US', {maximumFractionDigits:2})} sqft`
 			}
 		},
-		...(parseInt(context.taxYear) >= 2023 ?
+		...(taxYear >= 2023 ?
         [
             { label: '% Saving', dataKey: 'percentSaving', dataType: 'string', disablePadding: false,
                 render: (row, column) => {
@@ -64,7 +65,7 @@ const BuildingList = ({
 				return row[column.dataKey] ? `$${row[column.dataKey].toFixed(2)}` : '$0.00'
 			}
 		},
-		...(parseInt(context.taxYear) >= 2023 ?
+		...(taxYear >= 2023 ?
         [
             { label: 'PW Rate', dataKey: 'pwRate', dataType: 'string', disablePadding: false,
                 render: (row, column) => {
@@ -73,7 +74,7 @@ const BuildingList = ({
             }
         ] : []
 		)
-	], [context])
+	])
 	const [openState, setOpenState] = useState(false)
 	const [openMsgState, setOpenMsgState] = useState(false)
 	const [msgState, setMsgState] = useState()
