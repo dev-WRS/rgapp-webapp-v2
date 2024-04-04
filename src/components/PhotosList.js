@@ -83,6 +83,10 @@ const PhotosList = ({
 		const selectedPhoto = photos[index]
 		onDelete && onDelete(selectedPhoto)
 		setDescription('')
+		setOpenForChange(false)
+		setNewPhoto(null)
+		setPhoto(null)
+		setSelectionIndex(-1)
 	}
 
 	const handleOpen = () => {
@@ -120,16 +124,16 @@ const PhotosList = ({
 		} else if (event.target.files.length === 1) {
 			const asset = event.target.files[0]
 			if (asset) {
-				const description = asset.name
 				setOpen(0)
 				if (!openForChange) {
-						setPhoto(photo ? { ...photo, description, asset } : { description, asset })
+						setPhoto(photo ? { ...photo, description: description === '' ? asset.name : description, asset } 
+									   : { description: description === '' ? asset.name : description, asset })
 						setNewPhoto(null);
 					} else {
 						setNewPhoto({ photo, asset })
 						setPhoto(null)				
 					}
-					setDescription(photo?.description ?? '')
+					setDescription(description === '' ? asset.name : description)
 			} 
 		} else if (event.target.files.length > 1) {
 			setOpen(0)
