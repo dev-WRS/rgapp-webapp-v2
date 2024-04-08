@@ -95,7 +95,7 @@ const BuildingList = ({
 		const multiplier3 = parseInt(context.taxYear) === 2023 ? 1.07: 1.13;
 
 		const result = Math.min((((Math.ceil(percentSaving))/100 - 0.25) * 100) * multiplier1 + multiplier2, multiplier3)
-		return result
+		return result.toFixed(2)
 	}
 
 	const calculatePwRateByYear = (percentSaving) => {
@@ -104,7 +104,7 @@ const BuildingList = ({
 		const multiplier3 = parseInt(context.taxYear) === 2023 ? 5.36 : 5.65;
 
 		const result = Math.min((((Math.ceil(percentSaving))/100 - 0.25) * 100) * multiplier1 + multiplier2, multiplier3)
-		return result
+		return result.toFixed(2)
 	}
 
 	const handleValueChange = async (data) => {
