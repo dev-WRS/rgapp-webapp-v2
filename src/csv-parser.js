@@ -50,7 +50,12 @@ const parser = async (file, options = {}) => {
 							item[name] = sanitized.split(secondarySep)
 						}
 						else {
-							item[name] = values[i].trim()
+							if (name !== 'qualifyingcategories') {
+								item[name] = values[i].trim()
+							} else {
+								item[name] = values[i].split(secondarySep).map(value => value.trim())
+							}
+							
 						}
 						return item
 					}, {})

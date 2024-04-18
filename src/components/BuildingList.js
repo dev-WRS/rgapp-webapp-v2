@@ -12,12 +12,14 @@ import BuildingForm from 'components/BuildingForm'
 import { createBuilding } from 'actions'
 import { MSG_TYPE } from 'constants'
 
-const buildingValidate = (building) => {
-	const { name, type, address, qualifyingCategories, area, rate, method } = building
+import { useSelector } from 'react-redux'
+
+const buildingValidateBefore2023 = (building) => {
+	const { name, type, address, qualifyingcategories, area, rate, method } = building
 	return !!name && 
 		!!type && 
 		!!address && 
-		(qualifyingCategories && qualifyingCategories.length > 0) &&
+		(qualifyingcategories && qualifyingcategories.length > 0) &&
 		!!area &&
 		!!rate &&
 		!!method
@@ -42,6 +44,7 @@ const BuildingList = ({
 	onActionClose
 }) => {
 	const dispatch = useDispatch()
+	const deductions = useSelector(state => state.deductions && state.deductions.data)
 	const taxYear = parseInt(context.taxYear)
 	const columns = useMemo(() => [
 		{ label: 'Name', dataKey: 'name', dataType: 'string', disablePadding: false, render: undefined },
@@ -108,17 +111,51 @@ const BuildingList = ({
 	}
 
 	const handleValueChange = async (data) => {
-		for (const item of data) {
-			let newRate = 0
-			let pwNewRate = 0
-			const percentSaving = parseIntSafe(item.percentsaving)
+		if (taxYear >= 2023) {
+			for (const item of data) {
+				let newRate = 0
+				let pwNewRate = 0
+				const percentSaving = parseIntSafe(item.percentsaving)
 
-			newRate = calculateRateByYear(percentSaving);
-			pwNewRate = calculatePwRateByYear(percentSaving);
+				newRate = calculateRateByYear(percentSaving);
+				pwNewRate = calculatePwRateByYear(percentSaving);
 
-			item.rate = newRate
-			item.pwRate = pwNewRate
-			item.percentSaving = percentSaving
+				item.rate = newRate
+				item.pwRate = pwNewRate
+				item.percentSaving = percentSaving
+			}
+		} else {
+			for (const item of data) {			
+				let qualifiedDeduction = null;
+				let newRate = null;
+				item.qualifyingCategories = item.qualifyingcategories
+
+				const isNotJustLighting = !(item.qualifyingCategories.length === 1 && item.qualifyingCategories[0] === 'Lighting')
+				const newMethod = isNotJustLighting ? 'Permanent' : item.method
+
+				const newSavingsRequirement = item.qualifyingCategories.reduce((acc, curr) => {
+					qualifiedDeduction = deductions.find(item => item.taxYear <= parseInt(taxYear)
+										&& item.method === newMethod && item.qualifyingCategory === curr) || deductions.slice(-1);
+					newRate = qualifiedDeduction.taxDeduction
+
+					return (acc[curr] = qualifiedDeduction.savingsRequirement, acc);
+				}, {});
+				
+				if (item.qualifyingCategories.length === 2) {
+					newRate *= 2
+				}
+
+				item.rate = newRate
+				item.method = newMethod
+				item.savingsRequirement = newSavingsRequirement
+				
+				const isLightingWhole = item.qualifyingCategories && item.qualifyingCategories.length === 1 
+										&& item.qualifyingCategories[0] === 'Lighting' && item.method === 'Interim Whole Building'
+
+				item.totalWatts = isLightingWhole ? parseIntSafe(item.totalwatts) : 0
+				item.percentReduction = isLightingWhole ? parseIntSafe(item.percentreduction) : 0
+
+			}
 		}
 		const { error } = await dispatch(createBuilding(context.id, data))
 
@@ -190,7 +227,7 @@ const BuildingList = ({
 			) : (
 				<>
 					<EnterDataOptions
-						csvOptions={{ validate: parseInt(context.taxYear) >= 2023 ? buildingValidate2023 : buildingValidate }}
+						csvOptions={{ validate: parseInt(context.taxYear) >= 2023 ? buildingValidate2023 : buildingValidateBefore2023 }}
 						onValueChange={handleValueChange}
 						onEnterManually={handleEnterManually}
 					/>
