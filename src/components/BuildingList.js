@@ -45,6 +45,7 @@ const BuildingList = ({
 }) => {
 	const dispatch = useDispatch()
 	const deductions = useSelector(state => state.deductions && state.deductions.data)
+	const lpds = useSelector(state => state.lpds && state.lpds.data)
 	const taxYear = parseInt(context.taxYear)
 	const columns = useMemo(() => [
 		{ label: 'Name', dataKey: 'name', dataType: 'string', disablePadding: false, render: undefined },
@@ -110,10 +111,10 @@ const BuildingList = ({
 		return result.toFixed(2)
 	}
 
-	const handleValueChange = async (data) => {
-		if (taxYear >= 2023) {
-			for (const item of data) {
+	const handleValueChange = async (data) => {		
+		for (const item of data) {
 				let newRate = 0
+			if (taxYear >= 2023) {
 				let pwNewRate = 0
 				const percentSaving = parseIntSafe(item.percentsaving)
 
@@ -123,11 +124,8 @@ const BuildingList = ({
 				item.rate = newRate
 				item.pwRate = pwNewRate
 				item.percentSaving = percentSaving
-			}
-		} else {
-			for (const item of data) {			
+			} else {
 				let qualifiedDeduction = null;
-				let newRate = null;
 				item.qualifyingCategories = item.qualifyingcategories
 
 				const isNotJustLighting = !(item.qualifyingCategories.length === 1 && item.qualifyingCategories[0] === 'Lighting')
@@ -140,7 +138,7 @@ const BuildingList = ({
 
 					return (acc[curr] = qualifiedDeduction.savingsRequirement, acc);
 				}, {});
-				
+					
 				if (item.qualifyingCategories.length === 2) {
 					newRate *= 2
 				}
@@ -148,13 +146,17 @@ const BuildingList = ({
 				item.rate = newRate
 				item.method = newMethod
 				item.savingsRequirement = newSavingsRequirement
-				
+					
 				const isLightingWhole = item.qualifyingCategories && item.qualifyingCategories.length === 1 
 										&& item.qualifyingCategories[0] === 'Lighting' && item.method === 'Interim Whole Building'
 
 				item.totalWatts = isLightingWhole ? parseIntSafe(item.totalwatts) : 0
 				item.percentReduction = isLightingWhole ? parseIntSafe(item.percentreduction) : 0
 
+				const { lpd } = lpds.find(item => item.taxYear <= parseInt(taxYear) && item.buildingType === item.type) || lpds.slice(-1)
+
+				item.ashraeLpd = lpd ?? 0
+				item.ashraeRequiredLpd = item.ashraeLpd === 0 ? 0 : item.type === 'Warehouse' ? (lpd * 0.5).toFixed(3) : (lpd * 0.6).toFixed(3)
 			}
 		}
 		const { error } = await dispatch(createBuilding(context.id, data))
