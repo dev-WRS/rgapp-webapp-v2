@@ -7,7 +7,7 @@ import DataColumn from 'components/core/DataColumn'
 const statusOptions = {
 	inProgress: 'In Progress',
 	readyForReview: 'Ready For Review',
-	approved: 'Approved',
+	approved: 'Dale',
 	closed: 'Closed',
 }
 

@@ -51,7 +51,7 @@ const ProjectStatusChangeForm = ({
 	switch (record.status) {
 		case 'readyForReview':
 			options = [
-				{ 'text': 'Approved', id: 'approved' },
+				{ 'text': 'Dale', id: 'approved' },
 				{ 'text': 'In Progress', id: 'inProgress' }
 			]
 			break;
