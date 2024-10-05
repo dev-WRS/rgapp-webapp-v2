@@ -23,8 +23,8 @@ const ProjectList = ({
 	const theme = useTheme()
 
 	const columns = useMemo(() => [
-		{ label: 'Project ID', dataKey: 'projectID', dataType: 'string', disablePadding: false, render: undefined, filterable: true },
-		{ label: 'Name', dataKey: 'name', dataType: 'string', disablePadding: false, render: undefined, filterable: true },
+		{ label: 'Project ID', dataKey: 'projectID', dataType: 'string', disablePadding: false, render: undefined, filterable: true, searchable: true },
+		{ label: 'Name', dataKey: 'name', dataType: 'string', disablePadding: false, render: undefined, filterable: true, searchable: true },
 		{ label: 'Created At', dataKey: 'createDate', dataType: 'date', disablePadding: false, render: undefined, filterable: true },
 		{ label: 'Report Created At', dataKey: 'reportCreateDate', dataType: 'date', disablePadding: false, render: undefined, filterable: true },
 		{ label: 'Type', dataKey: 'reportType', dataType: 'string', disablePadding: false, render: undefined, filterable: true },

@@ -13,6 +13,7 @@
 		{ "path": "/certifiers", "ssr": "certifiers-ssr", "page": "Certifiers", "text": "Certifiers", "secure": true, "key": "list-certifiers", "icon": "graduate" },
 		{ "path": "/users", "ssr": "users-ssr", "page": "Users", "text": "Users", "secure": true, "key": "list-users", "icon": "user" },
 		{ "path": "/roles", "ssr": "roles-ssr", "page": "Roles", "text": "Roles", "secure": true, "key": "list-roles", "icon": "shield" },
+		{ "path": "/certifiedBuildings", "ssr": "certified-buildings-ssr", "page": "CertifiedBuildings", "text": "Certified Buildings", "secure": false, "key": "list-certified-buildings", "icon": "building-alt" },
 		{ "path": "/logout", "ssr": "logout-ssr", "secure": true },
 		{ "path": "/main", "ssr": "main-ssr", "secure": true }
 	]

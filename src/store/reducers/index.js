@@ -11,6 +11,7 @@ import certifiers from './certifiers'
 import projects from './projects'
 import deductions from './deductions'
 import lpds from './lpds'
+import certifiedBuildings from './certifiedBuildings'
 
 export default combineReducers({
 	auth,
@@ -23,5 +24,6 @@ export default combineReducers({
 	certifiers,
 	projects, 
 	deductions,
-	lpds
+	lpds,
+	certifiedBuildings,
 })

@@ -10,9 +10,22 @@ import Customers from './customers/Customers'
 import Certifiers from './certifiers/Certifiers'
 import Users from './users/Users'
 import Roles from './roles/Roles'
+import CertifiedBuildings from './certifiedBuildings/CertifiedBuildings';
 
-const pages = { Login, Forgot, EmailVerify, Reset, ChangePwd, 
-	Main, Projects, Assets, Customers, Certifiers, Users, Roles
-}
+const pages = {
+	Login,
+	Forgot,
+	EmailVerify,
+	Reset,
+	ChangePwd,
+	Main,
+	Projects,
+	Assets,
+	Customers,
+	Certifiers,
+	Users,
+	Roles,
+	CertifiedBuildings,
+};
 
 export default pages

@@ -36,7 +36,9 @@
 		"redux": "^4.2.0",
 		"redux-logger": "^3.0.6",
 		"redux-thunk": "^2.4.1",
-		"web-vitals": "^2.1.4"
+		"web-vitals": "^2.1.4",
+		"exceljs": "^4.4.0",
+    	"file-saver": "^2.0.5"
 	},
 	"scripts": {
 		"start": "npm-run-all -p build:watch serve",

@@ -44,7 +44,10 @@ const filterFn = filters => item => {
 
             result = result && operators[filter.operator].fn(formattedFilterValue, formattedItemValue, filter.dataType);
 			if (result === true) console.log('result', result)
-        } else {
+
+        } if (filter.value === 'true' || filter.value === 'false') {
+			result = result && operators[filter.operator].fn(filter.value === 'true', itemValue, filter.dataType)
+		} else {
 			result = result && operators[filter.operator].fn(filter.value, itemValue, filter.dataType)
 		}
 		i++
@@ -92,7 +95,8 @@ const DataBrowser = ({
 	onActionClose,
 	showTotalType,
 	dialogOpened,
-	origin
+	origin,
+	onFilteredRowsChange
 }) => {
 	const theme = useTheme()
 	const searchables = useMemo(() => columns
@@ -127,6 +131,17 @@ const DataBrowser = ({
 			return result
 		}, []))
 	}, [rows])
+	
+	const filteredRows = useMemo(() => {
+		const values = searching(filtering(rows, filtersState), searchState);
+		return values;
+	}, [rows, filtersState, searchState]);
+
+	useEffect(() => {
+		if (onFilteredRowsChange) {
+			onFilteredRowsChange(filteredRows);
+		}
+	}, [filteredRows, onFilteredRowsChange]);
 
 	const handleDeleteByDateDialog = () => {
 		setOpenDialog(true)
