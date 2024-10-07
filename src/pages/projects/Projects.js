@@ -6,6 +6,7 @@ import ProjectList from 'components/ProjectList'
 
 import AddProject from './AddProject'
 import CopyProject from './CopyProjects'
+import ExportExcelView from '../certifiedBuildings/ExportExcelView'
 import EditProject from './EditProject'
 import DeleteProject from './DeleteProject'
 import ChangeStatusProject from './ChangeStatusProject'
@@ -33,6 +34,7 @@ const Projects = () => {
 	const actions = useMemo(() => [
 		{ key: 'add-projects', label: 'Add', icon: 'plus', element: AddProject },
 		{ key: 'copy-projects', label: 'Copy', icon: 'copy', element: CopyProject, disabled: (selection) => (selection.length === 0) },
+		{ key: 'export-excel', label: 'Export to Excel', icon: 'file-excel', element: ExportExcelView, disabled: (selection) => (selection.length === 0) || (selection.length > 1) || (selection[0].status !== 'approved') || (selection[0].taxYear < 2023) },
 		{ key: 'edit-projects', label: 'Edit', icon: 'pencil', element: EditProject, disabled: (selection) => (selection.length !== 1 || selection[0].status === 'approved' || selection[0].status === 'closed'), default: true },
 		{ key: 'change-status-projects', label: 'Change Status', icon: 'swap', element: ChangeStatusProject, disabled: (selection) => (selection.length !== 1) || (selection[0].status !== 'inProgress' && auth.role.name === 'Staff'), default: true },
 		{ key: 'delete-projects', label: 'Delete', icon: 'trash-can', element: DeleteProject, disabled: (selection) => (selection.length === 0) },

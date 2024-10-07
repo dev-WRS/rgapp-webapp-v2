@@ -16,13 +16,6 @@ const certifiedBuildings = (
 				isLoading: true,
 				didInvalidate: false,
 			});
-			return Object.assign({}, state, {
-				inProgress: false,
-				isLoading: false,
-				didInvalidate: false,
-				data: action.payload || [],
-				lastUpdated: action.receivedAt,
-			});
 		case Types.FETCH_PROJECT_CERTIFIED_BUILDINGS_SUCCESS:
 			return Object.assign({}, state, {
 				inProgress: false,

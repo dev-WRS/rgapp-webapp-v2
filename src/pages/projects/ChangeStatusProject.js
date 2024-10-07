@@ -2,7 +2,8 @@ import { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 
 import ProjectStatusChangeForm from 'components/ProjectStatusChangeForm'
-import { fetchProject, updateProjectStatus } from 'actions'
+import { fetchProject, updateProjectStatus, getCertifiedBuildingToExport } from 'actions'
+import { exportToExcelCertifiedBuilding } from '../certifiedBuildings/exportExcel';
 import { MSG_TYPE } from 'constants'
 
 const ChangeStatusProject = ({
@@ -26,16 +27,26 @@ const ChangeStatusProject = ({
 		const { error } = await dispatch(updateProjectStatus(projectId, state))
 
 		if (error) {
-			onClose({
-				type: MSG_TYPE.error,
-				message: error.message
-			})
-		}
-		else {
-			onClose({
-				type: MSG_TYPE.success,
-				message: 'The project status has been successfully updated'
-			})
+			onClose({ type: MSG_TYPE.error, message: error.message })
+		} else {
+			if (state.status === 'approved') {
+				const {payload, error } = await dispatch(getCertifiedBuildingToExport(projectId))
+
+				if (error) {
+					onClose({ type: MSG_TYPE.error, message: error.message })
+				} else {
+					await exportToExcelCertifiedBuilding(payload)
+					onClose({
+						type: MSG_TYPE.success,
+						message: 'The project status has been successfully updated. Exported certified Building information to Excel file'
+					})
+				}
+			} else {
+				onClose({
+					type: MSG_TYPE.success,
+					message: 'The project status has been successfully updated'
+				})
+			}
 		}
 	}
 

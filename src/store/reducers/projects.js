@@ -36,6 +36,7 @@ const projects = (state = {
 		case Types.UPDATE_PROJECT_PDF:
 		case Types.GENERATE_PROJECT_REPORT:
 		case Types.DELETE_PROJECTS:
+		case Types.EXPORT_EXCEL_CERTIFIED_BUILDING:
 			return Object.assign({}, state, {
 				inProgress: true,
 				isLoading: false,
@@ -61,6 +62,7 @@ const projects = (state = {
 		case Types.CREATE_PROJECT_SUCCESS:
 		case Types.COPY_PROJECT_SUCCESS:
 		case Types.DELETE_PROJECTS_SUCCESS:
+		case Types.EXPORT_EXCEL_CERTIFIED_BUILDING_SUCCESS:
 			return Object.assign({}, state, {
 				inProgress: false,
 				isLoading: false,

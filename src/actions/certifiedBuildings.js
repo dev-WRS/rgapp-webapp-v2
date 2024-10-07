@@ -24,3 +24,15 @@ export const fetchCertifiedBuildings =
 
 		return { payload, error, ...others };
 	};
+
+export const getCertifiedBuildingToExport =
+	(id) =>
+	async (...args) => {
+		const { payload, error, ...others } = await actionRequest(...args)({
+			type: Types.EXPORT_EXCEL_CERTIFIED_BUILDING,
+			url: `/projects/certifiedBuildings/${id}/exportExcel`,
+			method: 'post',
+		});
+
+		return { payload, error, ...others };
+	};
