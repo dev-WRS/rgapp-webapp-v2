@@ -45,11 +45,12 @@ const Photos = ({
 
 	const handleAddMultiple = async (photosToUpload) => {
 		const data = new FormData()
-		let startPosition = photos.length
 
 		photosToUpload.forEach(photo => {
-			Object.keys(photo).forEach(name => data.append(name, photo[name]))
-			data.append('position', startPosition++)
+			data.append('position', photo.position)
+			Object.keys(photo).forEach(name => {
+				data.append(name, photo[name])
+			})
 		})
 		try {
 			const { error } = await dispatch(createMultipleProjectPhoto(projectId, data))

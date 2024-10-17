@@ -72,11 +72,25 @@ const PhotosList = ({
 
 	const handleAdd = () => {
 		photo.description = description
+		photo.position = photos.length
 		onAdd && onAdd({ ...photo })
 		setPhoto(null)
 		setDescription('')
 		setSelectionIndex(-1)
 	}
+
+	const handleAddMultiple = async (photosToUpload) => {
+        let startPosition = photos.length;
+        const formattedPhotos = photosToUpload.map((photo, index) => ({
+            ...photo,
+            position: startPosition + index
+        }));
+
+        await onAddMultiple && onAddMultiple(formattedPhotos);
+        setNewPhoto(null);
+        setPhoto(null);
+        setDescription('');
+    };
 
 	const handleUpdate = () => {
 		photo.description = description
@@ -86,7 +100,7 @@ const PhotosList = ({
 		setSelectionIndex(-1)
 	}
 
-	const handleDelete = (index) => (event) => {
+	const handleDelete1 = (index) => (event) => {
 		event.stopPropagation()
 		const selectedPhoto = photos[index]
 		onDelete && onDelete(selectedPhoto)
@@ -96,6 +110,34 @@ const PhotosList = ({
 		setPhoto(null)
 		setSelectionIndex(-1)
 	}
+
+	const handleDelete = (index) => (event) => {
+		event.stopPropagation();
+
+		const selectedPhoto = photos[index];
+		const positionToRemove = selectedPhoto.position;
+
+		const updatedPhotos = photos
+			.filter(photo => photo.id !== selectedPhoto.id)
+			.map(photo => {
+				if (photo.position > positionToRemove) {
+					return { ...photo, position: photo.position - 1 };
+				}
+				return photo;
+			});
+
+		setPhotos(updatedPhotos);
+
+		onDelete && onDelete(selectedPhoto);
+
+		onReorderPhotos && onReorderPhotos(updatedPhotos);
+
+		setDescription('');
+		setOpenForChange(false);
+		setNewPhoto(null);
+		setPhoto(null);
+		setSelectionIndex(-1);
+	};
 
 	const handleOpen = () => {
 		setOpen(open + 1)
@@ -148,7 +190,7 @@ const PhotosList = ({
 				setDescription('')
 				photosToUpload.push({ description, asset })
 			})
-			onAddMultiple && onAddMultiple(photosToUpload)
+			handleAddMultiple(photosToUpload);
 			setNewPhoto(null)
 			setPhoto(null)
 			setDescription('')
