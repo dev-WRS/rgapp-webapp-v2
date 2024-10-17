@@ -167,6 +167,18 @@ export const createMultipleProjectPhoto = (id, data) => async (...args) => {
 	return { payload, error, ...others }
 }
 
+export const reorderProjectPhotos = (id, data) => async (...args) => {
+    const { payload, error, ...others } = await actionRequest(...args)({
+        type: Types.REORDER_PROJECT_PHOTOS,
+        url: `/projects/${id}/photos/reorderPhotos`,
+		headers: { 'Content-Type': 'application/json' },
+        method: 'post',
+        data: { photos: data }
+    });
+
+    return { payload, error, ...others };
+};
+
 export const updateProjectPhoto = (id, { id: photoId, description }) => async (...args) => {
 	const { payload, error, ...others } = await actionRequest(...args)({
 		type: Types.UPDATE_PROJECT_PHOTO,

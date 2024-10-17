@@ -1,4 +1,7 @@
 import { useState, useEffect } from 'react'
+import { DndContext, closestCenter } from '@dnd-kit/core'
+import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
@@ -10,11 +13,9 @@ import MuiIconButton from '@mui/material/IconButton'
 import Snackbar from '@mui/material/Snackbar'
 import Alert from '@mui/material/Alert'
 
-import TextField from 'components/core/TextField'
+import SelectPhotoDescriptionField from 'components/core/SelectPhotoDescriptionField'
 import IconButton from 'components/core/IconButton'
 import PhotoGallery from 'components/core/PhotoGallery'
-import SelectPhotoDescriptionField from 'components/core/SelectPhotoDescriptionField'
-
 import InputFile from 'components/core/InputFile'
 import { useTheme } from '@emotion/react'
 import { Icon } from 'styles'
@@ -24,13 +25,14 @@ const PhotosList = ({
 	error,
 	inProgress,
 	emptyText = 'Photo Gallery',
-	photos,
+	photos: initialPhotos,
 	onAdd,
 	onAddMultiple,
 	onUpdate,
 	onDelete,
 	onUpdatePhoto,
-	onUpdateChange
+	onUpdateChange,
+	onReorderPhotos
 }) => {
 	const theme = useTheme()
 	const [openErrorMsg, setOpenErrorMsg] = useState(false)
@@ -39,13 +41,19 @@ const PhotosList = ({
 	const [photo, setPhoto] = useState(null)
 	const [newPhoto, setNewPhoto] = useState(null)
 	const [selectionIndex, setSelectionIndex] = useState(-1)
-	const [description, setDescription] = useState(photo && photo.description ? photo.description : '');
+	const [description, setDescription] = useState(photo && photo.description ? photo.description : '')
+	const [photos, setPhotos] = useState(initialPhotos)
+	const [isReordering, setIsReordering] = useState(false)
 
 	useEffect(() => {
-		setOpenErrorMsg(error ? true : false)	
+		setOpenErrorMsg(error ? true : false)
 	}, [error])
 
-	 useEffect(() => {
+	useEffect(() => {
+		setPhotos(initialPhotos)
+	}, [initialPhotos])
+
+	useEffect(() => {
 		setTimeout(() => {
 			console.log('newPhoto', newPhoto);
 			if (newPhoto && openForChange) {
@@ -103,11 +111,9 @@ const PhotosList = ({
 			setPhoto(null)
 			setSelectionIndex(-1)
 			setDescription('')
-		}
-		else {
+		} else {
 			const newPhoto = photos[index]
 			setDescription(newPhoto.description)
-
 			setSelectionIndex(index)
 			setPhoto({ ...newPhoto })
 			setNewPhoto({ photo: newPhoto, asset: null })
@@ -151,23 +157,34 @@ const PhotosList = ({
 
 	const handleDescriptionChange = (event) => {
 		setDescription(event.target.value)
-		
 		if (photo) {
 			setPhoto({ ...photo, description })
 		}
 	}
 
+	// Drag and drop handlers
+	const handleDragEnd = (event) => {
+		if (!isReordering) return
+		const { active, over } = event
+		if (active.id !== over.id) {
+			const oldIndex = photos.findIndex(photo => photo.id === active.id)
+			const newIndex = photos.findIndex(photo => photo.id === over.id)
+			const reorderedPhotos = arrayMove(photos, oldIndex, newIndex)
+				.map((photo, index) => ({ ...photo, position: index }))
+
+			setPhotos(reorderedPhotos)
+			onReorderPhotos && onReorderPhotos(reorderedPhotos)
+		}
+	}
+
+	const toggleReorder = () => {
+		setIsReordering(!isReordering)
+	}
+
 	return (
 		<Stack direction="column">
 			<Stack direction="row" spacing={2}>
-				{/* <TextField id="description" label="Photo Description"
-					fullWidth
-					size={'medium'}
-					value={(photo && photo.description) || ''}
-					onChange={handleDescriptionChange}
-					disabled={inProgress || (newPhoto !== null)}
-				/> */}
-				<SelectPhotoDescriptionField id="description" label="Photo Description" disabled={inProgress}
+				<SelectPhotoDescriptionField id="description" label="Photo Description" disabled={inProgress || isReordering}
 					fullWidth
 					size={'medium'}
 					value={description}
@@ -181,35 +198,44 @@ const PhotosList = ({
 					<Tooltip title={'Replace'} arrow>
 						<span>
 							<IconButton icon={'swap'} size={22} color={'white'} sx={{ marginTop: theme.spacing(1.2), marginRight: '5px' }}
-								disabled={(photo === null || (photo && !photo.id)) || (newPhoto !== null)}
-								// disabled={newPhoto === null} 
-								onClick={handleOpenForChange} 
+								disabled={(photo === null || (photo && !photo.id)) || (newPhoto !== null) || isReordering}
+								onClick={handleOpenForChange}
 							/>
 						</span>
 					</Tooltip>
 					<Tooltip title={'Upload'} arrow>
 						<span>
-							<IconButton icon={'upload'} size={22} color={'white'} sx={{ marginTop: theme.spacing(1.2), marginRight: '5px' }} 
-								disabled={(photo && !!photo.id) || inProgress} 
-								onClick={handleOpen} 
+							<IconButton icon={'upload'} size={22} color={'white'} sx={{ marginTop: theme.spacing(1.2), marginRight: '5px' }}
+								disabled={(photo && !!photo.id) || inProgress || isReordering}
+								onClick={handleOpen}
 							/>
 						</span>
 					</Tooltip>
 					<Tooltip title={'Add'} arrow>
 						<span>
-							<IconButton disabled={photo === null || (photo && !!photo.id)} icon={'plus'} size={22}
+							<IconButton disabled={photo === null || (photo && !!photo.id) || isReordering} icon={'plus'} size={22}
 								color="white"
-								sx={{ marginTop: theme.spacing(1.2), marginRight: '5px' }} 
-								onClick={handleAdd} 
+								sx={{ marginTop: theme.spacing(1.2), marginRight: '5px' }}
+								onClick={handleAdd}
 							/>
 						</span>
 					</Tooltip>
 					<Tooltip title={'Update'} arrow>
 						<span>
-							<IconButton disabled={(photo === null || (photo && !photo.id)) || (newPhoto !== null)} icon={'checkmark'} size={22} 
-								color={'white'} 
-								sx={{ marginTop: theme.spacing(1.2) }} 
-								onClick={handleUpdate} 
+							<IconButton disabled={(photo === null || (photo && !photo.id)) || (newPhoto !== null) || isReordering} icon={'checkmark'} size={22}
+								color={'white'}
+								sx={{ marginTop: theme.spacing(1.2) }}
+								onClick={handleUpdate}
+							/>
+						</span>
+					</Tooltip>
+					{/* Toggle para activar o desactivar el reordenamiento */}
+					<Tooltip title={isReordering ? 'Disable Reorder' : 'Enable Reorder'} arrow>
+						<span>
+							<IconButton icon={!isReordering ? 'make-group' : 'thumbs-up-alt'} size={22} color={isReordering ? 'primary' : 'default'}
+							disabled={photos.length < 2}
+								sx={{ marginTop: theme.spacing(1.2) }}
+								onClick={toggleReorder}
 							/>
 						</span>
 					</Tooltip>
@@ -237,25 +263,30 @@ const PhotosList = ({
 					borderColor: 'rgba(0, 0, 0, 0.23)'
 				}}
 			>
-				{(photos && photos.length > 0) ? (
-					<PhotoGallery sx={{ width: 552, height: 302, margin: 0 }} cols={2} rowHeight={182}>
+				{isReordering ? (
+					<DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+						<SortableContext items={photos.map((photo) => photo.id)} strategy={verticalListSortingStrategy}>
+							<PhotoGallery cols={2} rowHeight={182}>
+								{photos.map((item, index) => (
+									<SortablePhoto key={item.id} item={item} index={index} onDelete={handleDelete} onSelect={handleSelect} />
+								))}
+							</PhotoGallery>
+						</SortableContext>
+					</DndContext>
+				) : (
+					<PhotoGallery cols={2} rowHeight={182}>
 						{photos.map((item, index) => (
-							<ImageListItem key={index} onClick={handleSelect(index)}>
+							<ImageListItem key={item.id} onClick={handleSelect(index)}>
 								<img
-									style={{ border: selectionIndex !== index ? 'none' : '2px solid #88AC3ECC' }}
+									style={{ border: selectionIndex === index ? '2px solid #88AC3ECC' : 'none' }}
 									src={`/api/assets/${item.asset}`}
-									srcSet={`/api/assets/${item.asset}`}
 									alt={item.description}
 									loading="lazy"
 								/>
 								<ImageListItemBar
-									sx={{ backgroundColor: selectionIndex !== index ? '#4D4F5CCC' : '#88AC3ECC' }}
 									title={item.description}
 									actionIcon={
-										<MuiIconButton sx={{ position: 'relative', top: 0 }}
-											disabled={inProgress}
-											onClick={handleDelete(index)}
-										>
+										<MuiIconButton onClick={(e) => handleDelete(index)(e)} disabled={isReordering}>
 											<Icon icon={'trash-can'} size={22} color={'white'} />
 										</MuiIconButton>
 									}
@@ -263,8 +294,6 @@ const PhotosList = ({
 							</ImageListItem>
 						))}
 					</PhotoGallery>
-				) : (
-					<Typography color={'rgba(0, 0, 0, 0.38)'}>{emptyText}</Typography>
 				)}
 			</Box>
 			{(openErrorMsg) && (
@@ -275,6 +304,33 @@ const PhotosList = ({
 				</Snackbar>
 			)}
 		</Stack>
+	)
+}
+
+const SortablePhoto = ({ item, index, onDelete, onSelect }) => {
+	const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: item.id })
+	const style = {
+		transform: CSS.Transform.toString(transform),
+		transition,
+	}
+
+	return (
+		<ImageListItem ref={setNodeRef} style={style} {...attributes} {...listeners}>
+			<img
+				style={{ border: '2px solid #88AC3ECC' }}
+				src={`/api/assets/${item.asset}`}
+				alt={item.description}
+				loading="lazy"
+			/>
+			<ImageListItemBar
+				title={item.description}
+				actionIcon={
+					<MuiIconButton onClick={(e) => onDelete(index)(e)}>
+						<Icon icon={'trash-can'} size={22} color={'white'} />
+					</MuiIconButton>
+				}
+			/>
+		</ImageListItem>
 	)
 }
 

@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux'
 
 import PhotosList from 'components/PhotosList'
 import { createProjectPhoto, updateProjectPhoto, deleteProjectPhoto, updateProjectPhotoChange, 
-		 createMultipleProjectPhoto } from 'actions'
+		 createMultipleProjectPhoto, reorderProjectPhotos } from 'actions'
 
 const Photos = ({
 	mode,
@@ -16,7 +16,7 @@ const Photos = ({
 	const dispatch = useDispatch()
 	const project = useSelector(state => state.projects && state.projects.data &&
 		projectId && state.projects.data.find(project => project.id === projectId))
-	const photos = (project && project['photos']) ? project['photos'] : []
+	const [photos, setPhotos] = useState((project && project['photos']) ? project['photos'] : [])
 	const [errorState, setErrorState] = useState()
 	const [changeDone, setChangeDone] = useState(false)
 
@@ -26,19 +26,30 @@ const Photos = ({
 		}
 	}, [submit, onSubmit])
 
+	useEffect(() => {
+		const photosWithPosition = (project && project['photos'] ? project['photos'] : []).map((photo, index) => {
+			return photo.position !== undefined ? photo : { ...photo, position: index }
+		})
+		setPhotos(photosWithPosition)
+	}, [project])
+
 	const handleAdd = async (photo) => {
 		const data = new FormData()
-
 		Object.keys(photo).forEach(name => data.append(name, photo[name]))
+		const newPosition = photos.length
+		data.append('position', newPosition)
 
 		const { error } = await dispatch(createProjectPhoto(projectId, data))
 		if (error) setErrorState(error)
 	}
 
-	const handleAddMultiple = async( photosToUpload) => {
+	const handleAddMultiple = async (photosToUpload) => {
 		const data = new FormData()
+		let startPosition = photos.length
+
 		photosToUpload.forEach(photo => {
 			Object.keys(photo).forEach(name => data.append(name, photo[name]))
+			data.append('position', startPosition++)
 		})
 		try {
 			const { error } = await dispatch(createMultipleProjectPhoto(projectId, data))
@@ -53,7 +64,7 @@ const Photos = ({
 		if (error) setErrorState(error)
 	}
 
-	const handlePhotoChange = async ({asset, photo}) => {
+	const handlePhotoChange = async ({ asset, photo }) => {
 		try {
 			setTimeout(async () => {
 				if (changeDone) {
@@ -62,7 +73,7 @@ const Photos = ({
 				}
 				const data = new FormData()
 				data.append('asset', asset)
-				let error = '';
+				let error = ''
 				if (photo !== null) {
 					error = await dispatch(updateProjectPhotoChange(projectId, photo.asset, data)).error
 				} else {
@@ -70,7 +81,7 @@ const Photos = ({
 				}
 				if (error) setErrorState(error)
 	
-				setChangeDone(true);
+				setChangeDone(true)
 			}, 1000)
 		} catch (error) {
 			setErrorState(error)
@@ -86,6 +97,11 @@ const Photos = ({
 		if (error) setErrorState(error)
 	}
 
+	const handleReorder = async (orderedPhotos) => {
+		const { error } = await dispatch(reorderProjectPhotos(projectId, orderedPhotos))
+		if (error) setErrorState(error)
+	}
+
 	return (
 		<PhotosList
 			error={errorState}
@@ -97,6 +113,7 @@ const Photos = ({
 			onDelete={handleDelete}
 			onUpdatePhoto={handlePhotoChange}
 			onUpdateChange={handleUpdateChange}
+			onReorderPhotos={handleReorder}
 		/>
 	)
 }
