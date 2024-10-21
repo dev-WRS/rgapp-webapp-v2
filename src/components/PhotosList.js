@@ -225,6 +225,15 @@ const PhotosList = ({
 
 	return (
 		<Stack direction="column">
+			{}
+			<Box
+				sx={{
+					position: 'sticky',
+					top: 0,
+					backgroundColor: theme.palette.background.default,
+					padding: '8px 0',
+				}}
+			>
 			<Stack direction="row" spacing={2}>
 				<SelectPhotoDescriptionField id="description" label="Photo Description" disabled={inProgress || isReordering}
 					fullWidth
@@ -237,6 +246,7 @@ const PhotosList = ({
 					justifyContent='center'
 					alignItems="flex-start"
 				>
+					{}
 					<Tooltip title={'Replace'} arrow>
 						<span>
 							<IconButton icon={'swap'} size={22} color={'white'} sx={{ marginTop: theme.spacing(1.2), marginRight: '5px' }}
@@ -283,26 +293,17 @@ const PhotosList = ({
 					</Tooltip>
 				</Stack>
 			</Stack>
-			<InputFile
-				id="photos"
-				open={open}
-				accept="image/png, image/jpeg"
-				hidden
-				multiple={selectionIndex === -1}
-				onChange={handleFileChange}
-			/>
+			</Box>
 			<Box
-				alignItems="center"
-				justifyContent="center"
-				display="flex"
-				flex={1}
-				mb={3}
 				sx={{
+					overflowY: 'auto',
+					maxHeight: '400px',
 					minHeight: '302px',
 					borderRadius: '4px',
 					borderStyle: 'solid',
 					borderWidth: '1px',
-					borderColor: 'rgba(0, 0, 0, 0.23)'
+					borderColor: 'rgba(0, 0, 0, 0.23)',
+					marginTop: '16px'
 				}}
 			>
 				{isReordering ? (
