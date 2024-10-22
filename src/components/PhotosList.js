@@ -4,7 +4,6 @@ import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } 
 import { CSS } from '@dnd-kit/utilities'
 
 import Box from '@mui/material/Box'
-import Typography from '@mui/material/Typography'
 import Stack from '@mui/material/Stack'
 import Tooltip from '@mui/material/Tooltip'
 import ImageListItem from '@mui/material/ImageListItem'
@@ -65,7 +64,6 @@ const PhotosList = ({
 				setDescription('')
 			}
 		}, 1000)
-
 	},[newPhoto, onUpdatePhoto, openForChange]);
 
 	const handleErrorMsgClose = () => setOpenErrorMsg(false)
@@ -225,15 +223,6 @@ const PhotosList = ({
 
 	return (
 		<Stack direction="column">
-			{}
-			<Box
-				sx={{
-					position: 'sticky',
-					top: 0,
-					backgroundColor: theme.palette.background.default,
-					padding: '8px 0',
-				}}
-			>
 			<Stack direction="row" spacing={2}>
 				<SelectPhotoDescriptionField id="description" label="Photo Description" disabled={inProgress || isReordering}
 					fullWidth
@@ -246,7 +235,6 @@ const PhotosList = ({
 					justifyContent='center'
 					alignItems="flex-start"
 				>
-					{}
 					<Tooltip title={'Replace'} arrow>
 						<span>
 							<IconButton icon={'swap'} size={22} color={'white'} sx={{ marginTop: theme.spacing(1.2), marginRight: '5px' }}
@@ -281,7 +269,7 @@ const PhotosList = ({
 							/>
 						</span>
 					</Tooltip>
-					{/* Toggle para activar o desactivar el reordenamiento */}
+					{}
 					<Tooltip title={isReordering ? 'Disable Reorder' : 'Enable Reorder'} arrow>
 						<span>
 							<IconButton icon={!isReordering ? 'make-group' : 'thumbs-up-alt'} size={22} color={isReordering ? 'primary' : 'default'}
@@ -293,17 +281,23 @@ const PhotosList = ({
 					</Tooltip>
 				</Stack>
 			</Stack>
-			</Box>
+			<InputFile
+				id="photos"
+				open={open}
+				accept="image/png, image/jpeg"
+				hidden
+				multiple={selectionIndex === -1}
+				onChange={handleFileChange}
+			/>
 			<Box
-				sx={{
+					mb={3}
+					sx={{
+					height: '500px',
 					overflowY: 'auto',
-					maxHeight: '400px',
-					minHeight: '302px',
 					borderRadius: '4px',
 					borderStyle: 'solid',
 					borderWidth: '1px',
-					borderColor: 'rgba(0, 0, 0, 0.23)',
-					marginTop: '16px'
+					borderColor: 'rgba(0, 0, 0, 0.23)'
 				}}
 			>
 				{isReordering ? (
@@ -339,7 +333,7 @@ const PhotosList = ({
 					</PhotoGallery>
 				)}
 			</Box>
-			{(openErrorMsg) && (
+			{openErrorMsg && (
 				<Snackbar open={openErrorMsg} autoHideDuration={6000} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }} onClose={handleErrorMsgClose}>
 					<Alert onClose={handleErrorMsgClose} severity="error" variant="filled">
 						{error.message}
