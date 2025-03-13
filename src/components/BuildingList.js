@@ -16,9 +16,9 @@ import { useSelector } from 'react-redux'
 
 const buildingValidateBefore2023 = (building) => {
 	const { name, type, address, qualifyingcategories, area, rate, method } = building
-	return !!name && 
-		!!type && 
-		!!address && 
+	return !!name &&
+		!!type &&
+		!!address &&
 		(qualifyingcategories && qualifyingcategories.length > 0) &&
 		!!area &&
 		!!rate &&
@@ -27,8 +27,8 @@ const buildingValidateBefore2023 = (building) => {
 
 const buildingValidate2023 = (building) => {
 	const { name, type, address, area, categories, percentsaving } = building
-	return !!name && 
-		!!type && 
+	return !!name &&
+		!!type &&
 		!!address &&
 		!!categories &&
 		!!area &&
@@ -50,33 +50,37 @@ const BuildingList = ({
 	const columns = useMemo(() => [
 		{ label: 'Name', dataKey: 'name', dataType: 'string', disablePadding: false, render: undefined },
 		{ label: 'Type', dataKey: 'type', dataType: 'string', disablePadding: false, render: undefined },
-		{ label: 'Area', dataKey: 'area', dataType: 'string', disablePadding: false, 
+		{
+			label: 'Area', dataKey: 'area', dataType: 'string', disablePadding: false,
 			render: (row, column) => {
-				return `${row[column.dataKey].toLocaleString('en-US', {maximumFractionDigits:2})} sqft`
+				return `${row[column.dataKey].toLocaleString('en-US', { maximumFractionDigits: 2 })} sqft`
 			}
 		},
 		...(taxYear >= 2023 ?
-        [
-            { label: '% Saving', dataKey: 'percentSaving', dataType: 'string', disablePadding: false,
-                render: (row, column) => {
-					return row[column.dataKey] ? `${row[column.dataKey].toFixed(2)}%`: '0.00%'
-                }
-            }
-        ] : []
-    	),
-		{ label: 'Rate', dataKey: 'rate', dataType: 'string', disablePadding: false, 
+			[
+				{
+					label: '% Saving', dataKey: 'percentSaving', dataType: 'string', disablePadding: false,
+					render: (row, column) => {
+						return row[column.dataKey] ? `${row[column.dataKey].toFixed(2)}%` : '0.00%'
+					}
+				}
+			] : []
+		),
+		{
+			label: 'Rate', dataKey: 'rate', dataType: 'string', disablePadding: false,
 			render: (row, column) => {
 				return row[column.dataKey] ? `$${row[column.dataKey].toFixed(2)}` : '$0.00'
 			}
 		},
 		...(taxYear >= 2023 ?
-        [
-            { label: 'PW Rate', dataKey: 'pwRate', dataType: 'string', disablePadding: false,
-                render: (row, column) => {
-					return row['pwRate'] ? `$${row['pwRate'].toFixed(2)}` : '$0.00'
-                }
-            }
-        ] : []
+			[
+				{
+					label: 'PW Rate', dataKey: 'pwRate', dataType: 'string', disablePadding: false,
+					render: (row, column) => {
+						return row['pwRate'] ? `$${row['pwRate'].toFixed(2)}` : '$0.00'
+					}
+				}
+			] : []
 		)
 	])
 	const [openState, setOpenState] = useState(false)
@@ -87,33 +91,73 @@ const BuildingList = ({
 		setOpenState(true)
 	}
 
-    const parseIntSafe = (value) => {
-        if (!value) return 0;
-        const parsed = parseFloat(value, 10);
-        return isNaN(parsed) ? 0 : parsed;
-    }
+	const parseIntSafe = (value) => {
+		if (!value) return 0;
+		const parsed = parseFloat(value, 10);
+		return isNaN(parsed) ? 0 : parsed;
+	}
 
 	const calculateRateByYear = (percentSaving) => {
-		const multiplier1 = parseInt(context.taxYear) === 2023 ? 0.0212 : 0.0224;
-		const multiplier2 = parseInt(context.taxYear) === 2023 ? 0.54 : 0.57;
-		const multiplier3 = parseInt(context.taxYear) === 2023 ? 1.07: 1.13;
+		let multiplier1 = 0;
+		let multiplier2 = 0;
+		let multiplier3 = 0;
+		switch (parseInt(context.taxYear)) {
+			case 2023: {
+				multiplier1 = 0.0212;
+				multiplier2 = 0.54;
+				multiplier3 = 1.07;
+				break;
+			}
+			case 2024: {
+				multiplier1 = 0.0224;
+				multiplier2 = 0.57;
+				multiplier3 = 1.13;
+				break;
+			}
+			case 2025: {
+				multiplier1 = 0.0232;
+				multiplier2 = 0.58;
+				multiplier3 = 1.16;
+				break;
+			}
+		}
 
-		const result = Math.min((((Math.ceil(percentSaving))/100 - 0.25) * 100) * multiplier1 + multiplier2, multiplier3)
+		const result = Math.min((((Math.ceil(percentSaving)) / 100 - 0.25) * 100) * multiplier1 + multiplier2, multiplier3)
 		return result.toFixed(2)
 	}
 
 	const calculatePwRateByYear = (percentSaving) => {
-		const multiplier1 = parseInt(context.taxYear) === 2023 ? 0.11 : 0.1128;
-		const multiplier2 = parseInt(context.taxYear) === 2023 ? 2.68 : 2.83;
-		const multiplier3 = parseInt(context.taxYear) === 2023 ? 5.36 : 5.65;
+		let multiplier1 = 0;
+		let multiplier2 = 0;
+		let multiplier3 = 0;
+		switch (parseInt(context.taxYear)) {
+			case 2023: {
+				multiplier1 = 0.11;
+				multiplier2 = 2.68;
+				multiplier3 = 5.36;
+				break;
+			}
+			case 2024: {
+				multiplier1 = 0.1128;
+				multiplier2 = 2.83;
+				multiplier3 = 5.65;
+				break;
+			}
+			case 2025: {
+				multiplier1 = 0.1164;
+				multiplier2 = 2.90;
+				multiplier3 = 5.81;
+				break;
+			}
+		}
 
-		const result = Math.min((((Math.ceil(percentSaving))/100 - 0.25) * 100) * multiplier1 + multiplier2, multiplier3)
+		const result = Math.min((((Math.ceil(percentSaving)) / 100 - 0.25) * 100) * multiplier1 + multiplier2, multiplier3)
 		return result.toFixed(2)
 	}
 
-	const handleValueChange = async (data) => {		
+	const handleValueChange = async (data) => {
 		for (const item of data) {
-				let newRate = 0
+			let newRate = 0
 			if (taxYear >= 2023) {
 				let pwNewRate = 0
 				const percentSaving = parseIntSafe(item.percentsaving)
@@ -133,12 +177,12 @@ const BuildingList = ({
 
 				const newSavingsRequirement = item.qualifyingCategories.reduce((acc, curr) => {
 					qualifiedDeduction = deductions.find(item => item.taxYear <= parseInt(taxYear)
-										&& item.method === newMethod && item.qualifyingCategory === curr) || deductions.slice(-1);
+						&& item.method === newMethod && item.qualifyingCategory === curr) || deductions.slice(-1);
 					newRate = qualifiedDeduction.taxDeduction
 
 					return (acc[curr] = qualifiedDeduction.savingsRequirement, acc);
 				}, {});
-					
+
 				if (item.qualifyingCategories.length === 2) {
 					newRate *= 2
 				}
@@ -146,9 +190,9 @@ const BuildingList = ({
 				item.rate = newRate
 				item.method = newMethod
 				item.savingsRequirement = newSavingsRequirement
-					
-				const isLightingWhole = item.qualifyingCategories && item.qualifyingCategories.length === 1 
-										&& item.qualifyingCategories[0] === 'Lighting' && item.method === 'Interim Whole Building'
+
+				const isLightingWhole = item.qualifyingCategories && item.qualifyingCategories.length === 1
+					&& item.qualifyingCategories[0] === 'Lighting' && item.method === 'Interim Whole Building'
 
 				item.totalWatts = isLightingWhole ? parseIntSafe(item.totalwatts) : 0
 				item.percentReduction = isLightingWhole ? parseIntSafe(item.percentreduction) : 0
@@ -224,7 +268,7 @@ const BuildingList = ({
 					context={context}
 					onRefresh={onRefresh}
 					onActionClose={onActionClose}
-					showTotalType={{showTotal: true, type: 'Buildings'}}
+					showTotalType={{ showTotal: true, type: 'Buildings' }}
 				/>
 			) : (
 				<>
@@ -241,7 +285,7 @@ const BuildingList = ({
 					/>
 				</>
 			)}
-			
+
 			{(openMsgState) && (
 				<Snackbar open={openMsgState} autoHideDuration={6000} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }} onClose={handleMsgClose}>
 					<Alert onClose={handleMsgClose} severity={msgState.type} variant="filled">

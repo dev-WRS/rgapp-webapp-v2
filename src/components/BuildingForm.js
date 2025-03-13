@@ -52,30 +52,72 @@ const BuildingForm = ({
 
 	if (parseInt(context.taxYear) >= 2023) {
 		fields = ['name', 'type', 'address', 'qualifyingCategories', 'area', 'rate', 'pwRate', 'percentSaving', 'savingsRequirement']
-		validations = { name: ['required'],	address: ['required'], type: ['required'], qualifyingCategories: ['required'], area: ['required'],
-						rate: ['required'],
-						pwRate: ['required'],
-						percentSaving: ['required', { type: 'rangeNumber', minValue: 25, maxValue: 100 }] }
+		validations = {
+			name: ['required'], address: ['required'], type: ['required'], qualifyingCategories: ['required'], area: ['required'],
+			rate: ['required'],
+			pwRate: ['required'],
+			percentSaving: ['required', { type: 'rangeNumber', minValue: 25, maxValue: 100 }]
+		}
 	} else {
-		validations = {	name: ['required'],	address: ['required'],	type: ['required'],	qualifyingCategories: ['required'],	area: ['required'], rate: ['required'],	method: ['required'] }		
+		validations = { name: ['required'], address: ['required'], type: ['required'], qualifyingCategories: ['required'], area: ['required'], rate: ['required'], method: ['required'] }
 		fields = ['name', 'type', 'address', 'qualifyingCategories', 'area', 'rate', 'method', 'totalWatts', 'percentReduction', 'savingsRequirement']
 	}
 
 	const calculateRateByYear = (percentSaving) => {
-		const multiplier1 = parseInt(context.taxYear) === 2023 ? 0.0212 : 0.0224;
-		const multiplier2 = parseInt(context.taxYear) === 2023 ? 0.54 : 0.57;
-		const multiplier3 = parseInt(context.taxYear) === 2023 ? 1.07: 1.13;
+		let multiplier1 = 0;
+		let multiplier2 = 0;
+		let multiplier3 = 0;
+		switch (parseInt(context.taxYear)) {
+			case 2023: {
+				multiplier1 = 0.0212;
+				multiplier2 = 0.54;
+				multiplier3 = 1.07;
+				break;
+			}
+			case 2024: {
+				multiplier1 = 0.0224;
+				multiplier2 = 0.57;
+				multiplier3 = 1.13;
+				break;
+			}
+			case 2025: {
+				multiplier1 = 0.0232;
+				multiplier2 = 0.58;
+				multiplier3 = 1.16;
+				break;
+			}
+		}
 
-		const result = Math.min((((Math.ceil(percentSaving))/100 - 0.25) * 100) * multiplier1 + multiplier2, multiplier3)
+		const result = Math.min((((Math.ceil(percentSaving)) / 100 - 0.25) * 100) * multiplier1 + multiplier2, multiplier3)
 		return result.toFixed(2)
 	}
 
 	const calculatePwRateByYear = (percentSaving) => {
-		const multiplier1 = parseInt(context.taxYear) === 2023 ? 0.11 : 0.1128;
-		const multiplier2 = parseInt(context.taxYear) === 2023 ? 2.68 : 2.83;
-		const multiplier3 = parseInt(context.taxYear) === 2023 ? 5.36 : 5.65;
+		let multiplier1 = 0;
+		let multiplier2 = 0;
+		let multiplier3 = 0;
+		switch (parseInt(context.taxYear)) {
+			case 2023: {
+				multiplier1 = 0.11;
+				multiplier2 = 2.68;
+				multiplier3 = 5.36;
+				break;
+			}
+			case 2024: {
+				multiplier1 = 0.1128;
+				multiplier2 = 2.83;
+				multiplier3 = 5.65;
+				break;
+			}
+			case 2025: {
+				multiplier1 = 0.1164;
+				multiplier2 = 2.90;
+				multiplier3 = 5.81;
+				break;
+			}
+		}
 
-		const result = Math.min((((Math.ceil(percentSaving))/100 - 0.25) * 100) * multiplier1 + multiplier2, multiplier3)
+		const result = Math.min((((Math.ceil(percentSaving)) / 100 - 0.25) * 100) * multiplier1 + multiplier2, multiplier3)
 		return result.toFixed(2)
 	}
 
@@ -84,12 +126,12 @@ const BuildingForm = ({
 		let newRate = null
 		let pwNewRate = null
 		if (parseInt(context.taxYear) >= 2023) {
-			newRate = buildingDefaults.percentSaving && buildingDefaults.percentSaving > 0 
-						? calculateRateByYear(buildingDefaults.percentSaving)
-						: 0;
+			newRate = buildingDefaults.percentSaving && buildingDefaults.percentSaving > 0
+				? calculateRateByYear(buildingDefaults.percentSaving)
+				: 0;
 			pwNewRate = buildingDefaults.percentSaving && buildingDefaults.percentSaving > 0
-						? calculatePwRateByYear(buildingDefaults.percentSaving)
-						: 0;
+				? calculatePwRateByYear(buildingDefaults.percentSaving)
+				: 0;
 
 			calculatedDefaults = {
 				method: '',
@@ -100,12 +142,12 @@ const BuildingForm = ({
 				qualifyingCategories: ['Whole Building']
 			}
 
-		} else {			
+		} else {
 			const method = buildingDefaults ? buildingDefaults.method : state.method
-	
+
 			if (qualifyingCategories) {
 				const isNotJustLighting = !(qualifyingCategories.length === 1 && qualifyingCategories[0] === 'Lighting')
-	
+
 				const newMethod = isNotJustLighting ? 'Permanent' : method
 				let newQualifyingCategory = qualifyingCategories;
 
@@ -123,24 +165,24 @@ const BuildingForm = ({
 				let qualifiedDeduction = null;
 
 				newSavingsRequirement = newQualifyingCategory.reduce((acc, curr) => {
-					qualifiedDeduction = deductions.find(item => item.taxYear <= parseInt(context.taxYear) 
-														 && item.method === newMethod && item.qualifyingCategory === curr) || deductions.slice(-1);
+					qualifiedDeduction = deductions.find(item => item.taxYear <= parseInt(context.taxYear)
+						&& item.method === newMethod && item.qualifyingCategory === curr) || deductions.slice(-1);
 					newRate = qualifiedDeduction.taxDeduction;
 
 					return (acc[curr] = qualifiedDeduction.savingsRequirement, acc);
 				}, {});
-	
+
 				if (newQualifyingCategory.length === 2) {
 					newRate *= 2
 				}
-	
+
 				calculatedDefaults = {
 					method: newMethod,
 					savingsRequirement: newSavingsRequirement,
 					rate: newRate,
 					qualifyingCategories: newQualifyingCategory
 				}
-			}	
+			}
 		}
 		return Object.assign(buildingDefaults, calculatedDefaults)
 	}
@@ -167,7 +209,7 @@ const BuildingForm = ({
 					} else {
 						qualifyingCategories = buildingDefaults ? buildingDefaults['qualifyingCategories'] : ['Whole Building'];
 					}
-		
+
 					result['qualifyingCategories'] = qualifyingCategories;
 				}
 			}
@@ -195,11 +237,11 @@ const BuildingForm = ({
 		if (taxYear < 2023) {
 			setValidationsState(prevState => {
 				const newState = { ...prevState }
-				
-				
-					state.method && state.method !== 'Permanent' ? newState['totalWatts'] = ['required'] : delete newState['totalWatts']
-					state.method && state.method !== 'Permanent' ? newState['percentReduction'] = ['required', { type: 'rangeNumber', minValue: 25, maxValue: 100 }] : delete newState['percentReduction']
-				
+
+
+				state.method && state.method !== 'Permanent' ? newState['totalWatts'] = ['required'] : delete newState['totalWatts']
+				state.method && state.method !== 'Permanent' ? newState['percentReduction'] = ['required', { type: 'rangeNumber', minValue: 25, maxValue: 100 }] : delete newState['percentReduction']
+
 				formValidate(newState)
 				return newState
 			})
@@ -223,7 +265,7 @@ const BuildingForm = ({
 		const newPercentReduction = isNotJustLighting ? '' : state.percentReduction
 
 		const calculatedDefaults = calculateDefaults(state, value)
-		
+
 		onValueChange({ target: { id: 'rate', value: calculatedDefaults.rate } })
 		onValueChange({ target: { id: 'method', value: calculatedDefaults.method } })
 		onValueChange({ target: { id: 'totalWatts', value: newTotalWatts } })
@@ -236,30 +278,30 @@ const BuildingForm = ({
 		const value = event.target.value
 
 		const newTotalWatts = value === 'Permanent' ? '' : state.totalWatts
-		const newPercentReduction =  value === 'Permanent' ? '' : state.percentReduction
+		const newPercentReduction = value === 'Permanent' ? '' : state.percentReduction
 
 		// setValidationsState(prevState => {
 		// 	const newState = { ...prevState }
-			
+
 		// 	value !== 'Permanent' ? newState['totalWatts'] = ['required'] : delete newState['totalWatts']
 		// 	value !== 'Permanent' ? newState['percentReduction'] = ['required', { type: 'rangeNumber', minValue: 25, maxValue: 100 }] : delete newState['percentReduction']
 
 		// 	console.log('validate: ', newState)
 		// 	return newState
 		// })
-		
+
 		let newSavingsRequirement = null
 		let qualifiedDeduction = null
 		let newRate = null
 
-		newSavingsRequirement = state.qualifyingCategories.reduce((acc,curr) => {
+		newSavingsRequirement = state.qualifyingCategories.reduce((acc, curr) => {
 			qualifiedDeduction = deductions.find(item => item.taxYear <= parseInt(context.taxYear) && item.method === value && item.qualifyingCategory === curr) || deductions.slice(-1)
 			newRate = qualifiedDeduction.taxDeduction
 
-			return (acc[curr] = qualifiedDeduction.savingsRequirement,acc)
+			return (acc[curr] = qualifiedDeduction.savingsRequirement, acc)
 		}, {})
 
-		newSavingsRequirement = value === 'Permanent' ? newSavingsRequirement : null 
+		newSavingsRequirement = value === 'Permanent' ? newSavingsRequirement : null
 
 		onValueChange({ target: { id: 'rate', value: newRate } })
 		onValueChange({ target: { id: 'totalWatts', value: newTotalWatts } })
@@ -267,7 +309,7 @@ const BuildingForm = ({
 		onValueChange({ target: { id: 'savingsRequirement', value: newSavingsRequirement } })
 		onValueChange({ target: { id: 'method', value } })
 		if (value !== 'Permanent') {
-			onValueChange({ target: { id: 'type', value: ''} })
+			onValueChange({ target: { id: 'type', value: '' } })
 		}
 	}
 
@@ -290,7 +332,7 @@ const BuildingForm = ({
 		newRate = qualifiedDeduction.taxDeduction
 
 		if (parseInt(value) >= 25) {
-			const multiplier = 1 - ((10/3) * (0.4 - value/100))	
+			const multiplier = 1 - ((10 / 3) * (0.4 - value / 100))
 			newRate = multiplier >= 1 ? newRate : multiplier * 0.6
 		}
 
@@ -412,15 +454,15 @@ const BuildingForm = ({
 										size={'medium'}
 										valueProp="value"
 										textProp="value"
-										value={(state.qualifyingCategories && state.qualifyingCategories[0] === 'Whole Building') 
-												? ['HVAC', 'Lighting', 'Envelope'] 
-												: (state.qualifyingCategories && state.qualifyingCategories[0] === 'HVAC + L')
-												? ['HVAC', 'Lighting'] 
-												: (state.qualifyingCategories && state.qualifyingCategories[0] === 'HVAC + ENV') 
-												? ['HVAC', 'Envelope']
-												: (state.qualifyingCategories && state.qualifyingCategories[0] === 'L + ENV') 
-												? ['Lighting', 'Envelope'] 
-												: state.qualifyingCategories}
+										value={(state.qualifyingCategories && state.qualifyingCategories[0] === 'Whole Building')
+											? ['HVAC', 'Lighting', 'Envelope']
+											: (state.qualifyingCategories && state.qualifyingCategories[0] === 'HVAC + L')
+												? ['HVAC', 'Lighting']
+												: (state.qualifyingCategories && state.qualifyingCategories[0] === 'HVAC + ENV')
+													? ['HVAC', 'Envelope']
+													: (state.qualifyingCategories && state.qualifyingCategories[0] === 'L + ENV')
+														? ['Lighting', 'Envelope']
+														: state.qualifyingCategories}
 										options={[
 											{ 'value': 'HVAC' },
 											{ 'value': 'Lighting' },
@@ -441,7 +483,7 @@ const BuildingForm = ({
 										{...getError('area')}
 									/>
 								</Grid>
-								{ parseInt(context.taxYear) < 2023 && (
+								{parseInt(context.taxYear) < 2023 && (
 									<Grid item xs={2.5}>
 										<CurrencyField id="rate" label="Rate" disabled={inProgress}
 											fullWidth
@@ -454,7 +496,7 @@ const BuildingForm = ({
 									</Grid>
 								)}
 							</Grid>
-							{ parseInt(context.taxYear) >= 2023 && (
+							{parseInt(context.taxYear) >= 2023 && (
 								<Grid container spacing={2}>
 									<Grid item xs={6}>
 										<NumberField id="percentSaving" label="Percent Saving"
@@ -467,7 +509,7 @@ const BuildingForm = ({
 											InputProps={{
 												endAdornment: <InputAdornment position="start">%</InputAdornment>
 											}}
-											//sx={{ display: state.method && state.method !== 'Permanent' ? 'block' : 'none' }}
+										//sx={{ display: state.method && state.method !== 'Permanent' ? 'block' : 'none' }}
 										/>
 									</Grid>
 									<Grid item xs={3}>
@@ -490,48 +532,48 @@ const BuildingForm = ({
 											{...getError('pwRate')}
 										/>
 									</Grid>
-								</Grid>							
+								</Grid>
 							)}
-							{ parseInt(context.taxYear) < 2023 && (
+							{parseInt(context.taxYear) < 2023 && (
 								<>
-								<SelectField id="method" label="Method" disabled={!(qualifyLightingCategory) || inProgress}
-									fullWidth
-									size={'medium'}
-									valueProp="value"
-									textProp="value"
-									value={state.method}
-									options={[
-										{ 'value': 'Permanent' },
-										{ 'value': 'Interim Whole Building' },
-										{ 'value': 'Interim Space-by-Space' }
-									]}
-									onChange={handleMethodChange}
-									onBlur={onBlur}
-									{...getError('method')}
-								/>
-								<Stack direction="row" spacing={2}>
-									<NumberField id="totalWatts" label="Total Watts" disabled={(!(qualifyLightingCategory && state.method && state.method !== 'Permanent')) || inProgress}
+									<SelectField id="method" label="Method" disabled={!(qualifyLightingCategory) || inProgress}
 										fullWidth
 										size={'medium'}
-										value={state.totalWatts}
-										onChange={onValueChange}
+										valueProp="value"
+										textProp="value"
+										value={state.method}
+										options={[
+											{ 'value': 'Permanent' },
+											{ 'value': 'Interim Whole Building' },
+											{ 'value': 'Interim Space-by-Space' }
+										]}
+										onChange={handleMethodChange}
 										onBlur={onBlur}
-										{...getError('totalWatts')}
-										//sx={{ display: state.method && state.method !== 'Permanent' ? 'block' : 'none' }}
+										{...getError('method')}
 									/>
-									<NumberField id="percentReduction" label="Reduction" disabled={(!(qualifyLightingCategory && state.method && state.method !== 'Permanent')) || inProgress}
-										fullWidth
-										size={'medium'}
-										value={state.percentReduction}
-										onChange={handlePercentReductionChange}
-										onBlur={onBlur}
-										{...getError('percentReduction')}
-										InputProps={{
-											endAdornment: <InputAdornment position="start">%</InputAdornment>
-										}}
+									<Stack direction="row" spacing={2}>
+										<NumberField id="totalWatts" label="Total Watts" disabled={(!(qualifyLightingCategory && state.method && state.method !== 'Permanent')) || inProgress}
+											fullWidth
+											size={'medium'}
+											value={state.totalWatts}
+											onChange={onValueChange}
+											onBlur={onBlur}
+											{...getError('totalWatts')}
 										//sx={{ display: state.method && state.method !== 'Permanent' ? 'block' : 'none' }}
-									/>
-								</Stack>
+										/>
+										<NumberField id="percentReduction" label="Reduction" disabled={(!(qualifyLightingCategory && state.method && state.method !== 'Permanent')) || inProgress}
+											fullWidth
+											size={'medium'}
+											value={state.percentReduction}
+											onChange={handlePercentReductionChange}
+											onBlur={onBlur}
+											{...getError('percentReduction')}
+											InputProps={{
+												endAdornment: <InputAdornment position="start">%</InputAdornment>
+											}}
+										//sx={{ display: state.method && state.method !== 'Permanent' ? 'block' : 'none' }}
+										/>
+									</Stack>
 								</>
 
 							)}
