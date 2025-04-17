@@ -157,7 +157,7 @@ const BuildingForm = ({
 					newQualifyingCategory = ['HVAC', 'Lighting'];
 				} else if (qualifyingCategories.length === 1 && qualifyingCategories[0] === 'HVAC + ENV') {
 					newQualifyingCategory = ['HVAC', 'Envelope'];
-				} else if (qualifyingCategories.length === 1 && qualifyingCategories[0] === 'L + ENV') {
+				} else if (qualifyingCategories.length === 1 && qualifyingCategories[0] === 'L+ENV') {
 					newQualifyingCategory = ['Lighting', 'Envelope'];
 				}
 
@@ -459,7 +459,7 @@ const BuildingForm = ({
 												? ['HVAC', 'Lighting']
 												: (state.qualifyingCategories && state.qualifyingCategories[0] === 'HVAC + ENV')
 													? ['HVAC', 'Envelope']
-													: (state.qualifyingCategories && state.qualifyingCategories[0] === 'L + ENV')
+													: (state.qualifyingCategories && state.qualifyingCategories[0] === 'L+ENV')
 														? ['Lighting', 'Envelope']
 														: state.qualifyingCategories}
 										options={[
