@@ -190,18 +190,18 @@ const BuildingForm = ({
 			const method = buildingDefaults ? buildingDefaults.method : state.method
 
 			if (qualifyingCategories) {
-				const isNotJustLighting = !(qualifyingCategories.length === 1 && cat === 'Lighting')
-	
+				const isNotJustLighting = !(qualifyingCategories.length === 1 && qualifyingCategories[0] === 'Lighting')
+
 				const newMethod = isNotJustLighting ? 'Permanent' : method
 				let newQualifyingCategory = qualifyingCategories;
 
 				if (qualifyingCategories.length === 3) {
 					newQualifyingCategory = ['Whole Building'];
-				} else if (qualifyingCategories.length === 1 && cat === 'HVAC+L') {
+				} else if (qualifyingCategories.length === 1 && qualifyingCategories[0] === 'HVAC + L') {
 					newQualifyingCategory = ['HVAC', 'Lighting'];
-				} else if (qualifyingCategories.length === 1 && cat === 'HVAC+ENV') {
+				} else if (qualifyingCategories.length === 1 && qualifyingCategories[0] === 'HVAC + ENV') {
 					newQualifyingCategory = ['HVAC', 'Envelope'];
-				} else if (qualifyingCategories.length === 1 && cat === 'L+ENV') {
+				} else if (qualifyingCategories.length === 1 && qualifyingCategories[0] === 'L+ENV') {
 					newQualifyingCategory = ['Lighting', 'Envelope'];
 				}
 
@@ -277,14 +277,10 @@ const BuildingForm = ({
 
 	const qualifyLightingCategory = state.qualifyingCategories && state.qualifyingCategories.length === 1 && state.qualifyingCategories[0] === 'Lighting'
 
-	const firstCat = state.qualifyingCategories?.[0] || '';
-	const cat = normalizePlus(firstCat);
-
 	useEffect(() => {
 		if (taxYear < 2023) {
 			setValidationsState(prevState => {
 				const newState = { ...prevState }
-
 
 				state.method && state.method !== 'Permanent' ? newState['totalWatts'] = ['required'] : delete newState['totalWatts']
 				state.method && state.method !== 'Permanent' ? newState['percentReduction'] = ['required', { type: 'rangeNumber', minValue: 25, maxValue: 100 }] : delete newState['percentReduction']
@@ -397,8 +393,6 @@ const BuildingForm = ({
 		onValueChange({ target: { id: 'pwRate', value: pwNewRate || state.pwRate } })
 	}
 
-	const normalizePlus = (str = '') => str.replace(/\s*\+\s*/g, '+');
-
 	return (
 		<>
 			<Dialog
@@ -503,15 +497,15 @@ const BuildingForm = ({
 										size={'medium'}
 										valueProp="value"
 										textProp="value"
-										value={(firstCat === 'Whole Building') 
-												? ['HVAC', 'Lighting', 'Envelope'] 
-												: (cat === 'HVAC+L')
-												? ['HVAC', 'Lighting'] 
-												: (cat === 'HVAC+ENV') 
-												? ['HVAC', 'Envelope']
-												: (cat === 'L+ENV') 
-												? ['Lighting', 'Envelope'] 
-												: state.qualifyingCategories}
+										value={(state.qualifyingCategories && state.qualifyingCategories[0] === 'Whole Building')
+											? ['HVAC', 'Lighting', 'Envelope']
+											: (state.qualifyingCategories && state.qualifyingCategories[0] === 'HVAC + L')
+												? ['HVAC', 'Lighting']
+												: (state.qualifyingCategories && state.qualifyingCategories[0] === 'HVAC + ENV')
+													? ['HVAC', 'Envelope']
+													: (state.qualifyingCategories && state.qualifyingCategories[0] === 'L+ENV')
+														? ['Lighting', 'Envelope']
+														: state.qualifyingCategories}
 										options={[
 											{ 'value': 'HVAC' },
 											{ 'value': 'Lighting' },
