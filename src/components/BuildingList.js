@@ -155,6 +155,50 @@ const BuildingList = ({
 		return result.toFixed(2)
 	}
 
+	function calculateRate(taxYear, percentSavings) {
+		if (percentSavings < 25) return { rate: 0, pwRate: 0 };
+
+		const params = {
+			2023: {
+				baseStart: 0.54,
+				baseMax: 1.07,
+				baseStep: 0.02,
+				bonusStart: 2.68,
+				bonusMax: 5.36,
+				bonusStep: 0.11,
+			},
+			2024: {
+				baseStart: 0.57,
+				baseMax: 1.13,
+				baseStep: 0.02,
+				bonusStart: 2.83,
+				bonusMax: 5.65,
+				bonusStep: 0.11,
+			},
+			2025: {
+				baseStart: 0.58,
+				baseMax: 1.16,
+				baseStep: 0.02,
+				bonusStart: 2.9,
+				bonusMax: 5.81,
+				bonusStep: 0.12,
+			},
+		};
+
+		const p = params[taxYear];
+		if (!p) throw new Error(`Unsupported tax year: ${taxYear}`);
+
+		const extraPct = percentSavings - 25;
+
+		const rawBase = p.baseStart + extraPct * p.baseStep;
+		const rawBonus = p.bonusStart + extraPct * p.bonusStep;
+
+		return {
+			rate: Math.min(rawBase, p.baseMax).toFixed(2) * 1,
+			pwRate: Math.min(rawBonus, p.bonusMax).toFixed(2) * 1,
+		};
+	}
+
 	const handleValueChange = async (data) => {
 		for (const item of data) {
 			let newRate = 0
@@ -162,8 +206,8 @@ const BuildingList = ({
 				let pwNewRate = 0
 				const percentSaving = parseIntSafe(item.percentsaving)
 
-				newRate = calculateRateByYear(percentSaving);
-				pwNewRate = calculatePwRateByYear(percentSaving);
+				newRate = calculateRate(taxYear, percentSaving).rate;
+				pwNewRate = calculateRate(taxYear, percentSaving).pwRate;
 
 				item.rate = newRate
 				item.pwRate = pwNewRate

@@ -121,16 +121,60 @@ const BuildingForm = ({
 		return result.toFixed(2)
 	}
 
+	function calculateRate(taxYear, percentSavings) {
+		if (percentSavings < 25) return { rate: 0, pwRate: 0 };
+
+		const params = {
+			2023: {
+				baseStart: 0.54,
+				baseMax: 1.07,
+				baseStep: 0.02,
+				bonusStart: 2.68,
+				bonusMax: 5.36,
+				bonusStep: 0.11,
+			},
+			2024: {
+				baseStart: 0.57,
+				baseMax: 1.13,
+				baseStep: 0.02,
+				bonusStart: 2.83,
+				bonusMax: 5.65,
+				bonusStep: 0.11,
+			},
+			2025: {
+				baseStart: 0.58,
+				baseMax: 1.16,
+				baseStep: 0.02,
+				bonusStart: 2.9,
+				bonusMax: 5.81,
+				bonusStep: 0.12,
+			},
+		};
+
+		const p = params[taxYear];
+		if (!p) throw new Error(`Unsupported tax year: ${taxYear}`);
+
+		const extraPct = percentSavings - 25;
+
+		const rawBase = p.baseStart + extraPct * p.baseStep;
+		const rawBonus = p.bonusStart + extraPct * p.bonusStep;
+
+		return {
+			rate: Math.min(rawBase, p.baseMax).toFixed(2) * 1,
+			pwRate: Math.min(rawBonus, p.bonusMax).toFixed(2) * 1,
+		};
+	}
+
 	const calculateDefaults = (buildingDefaults, qualifyingCategories) => {
 		let calculatedDefaults = {}
 		let newRate = null
 		let pwNewRate = null
 		if (parseInt(context.taxYear) >= 2023) {
 			newRate = buildingDefaults.percentSaving && buildingDefaults.percentSaving > 0
-				? calculateRateByYear(buildingDefaults.percentSaving)
+				? calculateRate(parseInt(context.taxYear), buildingDefaults.percentSaving).rate
 				: 0;
 			pwNewRate = buildingDefaults.percentSaving && buildingDefaults.percentSaving > 0
-				? calculatePwRateByYear(buildingDefaults.percentSaving)
+				? calculateRate(parseInt(context.taxYear), buildingDefaults.percentSaving).pwRate
 				: 0;
 
 			calculatedDefaults = {
@@ -345,8 +389,8 @@ const BuildingForm = ({
 
 	const handlePercentSavingChange = (event) => {
 		const value = event.target.value
-		const newRate = value > 0 ? calculateRateByYear(value) : 0;
-		const pwNewRate = value > 0 ? calculatePwRateByYear(value) : 0;
+		const newRate = value > 0 ? calculateRate(parseInt(context.taxYear), value).rate : 0;
+		const pwNewRate = value > 0 ? calculateRate(parseInt(context.taxYear), value).pwRate : 0;
 
 		onValueChange({ target: { id: 'percentSaving', value } })
 		onValueChange({ target: { id: 'rate', value: newRate || state.rate } })
